@@ -208,4 +208,7 @@
       flag = #{flag,jdbcType=INTEGER}
     where id = #{id,jdbcType=INTEGER}
   </update>
+  <select id="selectByName" resultMap="BaseResultMap">
+    select  * from t_admin where name = #{account}
+  </select>
 </mapper>
