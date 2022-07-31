@@ -1,6 +1,7 @@
 package com.hxzy.controller;
 
 import com.hxzy.service.CaptchaService;
+import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;

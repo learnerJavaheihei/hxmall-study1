@@ -66,15 +66,12 @@
       </foreach>
     </where>
   </sql>
-  <sql id="Base_Column_List" >
-    id, name, no, password, flag
-  </sql>
   <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.hxzy.entity.AdminExample" >
     select
     <if test="distinct" >
       distinct
     </if>
-    <include refid="Base_Column_List" />
+    id, name, no, password, flag
     from t_admin
     <if test="_parameter != null" >
       <include refid="Example_Where_Clause" />
@@ -84,8 +81,8 @@
     </if>
   </select>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
-    select 
-    <include refid="Base_Column_List" />
+    select
+      id, name, no, password, flag
     from t_admin
     where id = #{id,jdbcType=INTEGER}
   </select>
@@ -208,7 +205,7 @@
       flag = #{flag,jdbcType=INTEGER}
     where id = #{id,jdbcType=INTEGER}
   </update>
-  <select id="selectByName" resultMap="BaseResultMap">
-    select  * from t_admin where name = #{account}
+  <select id="selectByName" resultType="com.hxzy.entity.Admin">
+    select  * from t_admin where t_admin.name = #{account}
   </select>
 </mapper>

@@ -105,7 +105,7 @@
 
             //发送ajax请求去请求后端接口
             $.post("/api/admin/login.do",data,function (result){
-                if (result.code =10000){
+                if (result.code ==10000){
                     layer.msg("登录成功",function (){
                         //将数据存储到磁盘上
                         localStorage.setItem("admin",JSON.stringify(result.data));

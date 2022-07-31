@@ -20,6 +20,9 @@
             <bean class="com.hxzy.interceptor.LoginAdminFilter"/>
         </mvc:interceptor>
     </mvc:interceptors>
+    <bean class="com.hxzy.config.SwaggerConfig"></bean>
+    <mvc:resources location="classpath:/META-INF/resources/" mapping="swagger-ui.html"/>
+    <mvc:resources location="classpath:/META-INF/resources/webjars/" mapping="/webjars/**"/>
     <!--
    两个标准配置
    SpringMvc不能处理的请求交给Tomcat处理
@@ -31,9 +34,9 @@
         <property name="prefix" value="/WEB-INF/views/"/>
         <property name="suffix" value=".jsp"/>
     </bean>
-
-
-    <mvc:view-controller path="/toIndex" view-name="index"></mvc:view-controller>
-    <mvc:view-controller path="toList" view-name="list"></mvc:view-controller>
-
+<!--    文件解析器-->
+    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+        <property name="defaultEncoding" value="utf-8"/>
+        <property name="maxUploadSize" value="50000000"/>
+    </bean>
 </beans>

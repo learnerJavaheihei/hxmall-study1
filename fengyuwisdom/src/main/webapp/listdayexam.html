@@ -19,19 +19,20 @@
                 <form class="layui-form layui-form-pane" action="">
                     <div class="layui-form-item">
                         <div class="layui-inline">
-                            <label class="layui-form-label">用户姓名</label>
+                            <label class="layui-form-label">学生姓名</label>
                             <div class="layui-input-inline">
-                                <input type="text" name="username" autocomplete="off" class="layui-input">
+                                <input type="text" name="name" autocomplete="off" class="layui-input-name" style="height: 30px">
                             </div>
                         </div>
                         <div class="layui-inline">
-                            <label class="layui-form-label">用户性别</label>
+                            <label class="layui-form-label">日期</label>
                             <div class="layui-input-inline">
-                                <input type="text" name="sex" autocomplete="off" class="layui-input">
+                                <input type="text" name="cdate" autocomplete="off" class="layui-input-cdate" style="height: 30px">
                             </div>
                         </div>
                         <div class="layui-inline">
-                            <button type="submit" class="layui-btn layui-btn-primary"  lay-submit lay-filter="data-search-btn"><i class="layui-icon"></i> 搜 索</button>
+                            <button type="button" class="layui-btn layui-btn-primary"  lay-submit="" lay-filter="data-search-btn"><i class="layui-icon"></i> 搜 索</button>
+                            <button type="reset" class="layui-btn layui-btn-primary" lay-submit="" lay-filter="data-reset-btn">重 置</button>
                         </div>
                     </div>
                 </form>
@@ -40,22 +41,195 @@
 
         <script type="text/html" id="toolbarDemo">
             <div class="layui-btn-container">
-                <button class="layui-btn layui-btn-normal layui-btn-sm data-add-btn" lay-event="add"> 添加 </button>
+                <button class="layui-btn layui-btn-normal layui-btn-sm data-add-btn" lay-event="add">添加</button>
+                <button class="layui-btn layui-btn-normal layui-btn-sm data-add-btn" lay-event="deletebatch">批量删除</button>
                 <button class="layui-btn layui-btn-sm layui-btn-danger data-delete-btn" lay-event="addbatch"> 批量导入 </button>
+                <button class="layui-btn layui-btn-sm layui-btn-danger data-delete-btn" lay-event="exportbatch"> 批量导出 </button>
             </div>
         </script>
 
         <table class="layui-hide" id="currentTableId" lay-filter="currentTableFilter"></table>
-
+        <div id="pageLimit"></div>
         <script type="text/html" id="currentTableBar">
-            <a class="layui-btn layui-btn-normal layui-btn-xs data-count-edit" lay-event="edit">编辑</a>
+            <a class="layui-btn layui-btn-normal layui-btn-xs data-count-edit" lay-event="edit">修改</a>
             <a class="layui-btn layui-btn-xs layui-btn-danger data-count-delete" lay-event="delete">删除</a>
         </script>
 
     </div>
 </div>
 <script src="lib/layui-v2.6.3/layui.js" charset="utf-8"></script>
+<script>
+    //查询
+    layui.use(['table','laypage','layer','jquery','form'],function (){
+        var table=layui.table,
+            laypage=layui.laypage,
+            layer=layui.layer,
+            form=layui.form,
+            $=layui.jquery;
+        table.render({
+            elem: '#currentTableId'
+            ,height: 400
+            ,url: '/dayexam/query.do' //数据接口
+            ,page:true
+            ,toolbar: '#toolbarDemo'
+            ,defaultToolbar: ["filter","print",{
+                title:'提示',
+                layEvent:'LAYTABLE_TIPS',
+                icon:'layui-icon-tips'
+            }]
+            ,cols: [[ //表头
+                {type: 'checkbox', fixed: 'left',align:'center'}
+                ,{field: 'id', title: '编号', width:80, sort: true, fixed: 'left',align:'center'}
+                ,{field: 'sid', title: '学号', width:100,align:'center'}
+                ,{field: 'name', title: '学生姓名', width:150,align:'center'}
+                ,{field: 'score', title: '分数', width:80, sort: true,align:'center'}
+                ,{field: 'cdate', title: '日期', width:250, sort: true,align:'center'}
+                ,{field: 'info', title: '信息', width:250,align:'center'}
+                ,{title: '操作', width:200,toolbar:'#currentTableBar',fixed:'right',minWidth:120,align:'center'}
+            ]]
+            ,limits:[4,8,12]
+            ,limit:4
+            ,skin: 'line'
+        });
+        //分页
 
+        //搜索
+        form.on('submit(data-search-btn)',function (){
+            var stuName = $('.layui-input-name').val();
+            var cdate = $(".layui-input-cdate").val();
+            table.reload('currentTableId',{
+                url:"/dayexam/queryBy.do",
+                method:"GET",
+                where:{
+                    name:stuName,
+                    cdate:cdate
+                }
+                ,page: {
+                    curr: 1 //重新从第 1 页开始
+                }
+            });
+            return false;
+        })
+        //搜索重置
+        form.on('submit(data-reset-btn)',function (){
+            tableFeresh('currentTableId',1)
+        })
+
+        //页面刷新
+        function tableFeresh(ele,currNum,param){
+            table.reload(ele,{
+                url:'/dayexam/query.do'
+                ,page:{
+                    curr:currNum
+                },
+                where:{
+                    serachParam:param
+                }
+            },'data')
+        }
+
+        //表格行监听操作
+        table.on('tool(currentTableFilter)',function (obj){
+            var data=obj.data;
+            var layEvent = obj.event;
+            var tr=obj.tr;
+            var daydata = JSON.stringify(data);
+            localStorage.setItem("dayexam",daydata);
+            if(layEvent==='delete'){
+                layer.confirm("确定删除该行吗？",function (index){
+                    var dayData = JSON.stringify(data);
+                    obj.del();
+                    layer.close(index);
+                    $.ajax({
+                        url:"/dayexam/deleteBySid.do",
+                        type:"POST",
+                        contentType:'application/json;charset=utf-8',
+                        data:dayData,
+                        success:function (data){
+                            if(data.code==10000){
+                                layer.alert("删除成功！")
+                                tableFeresh('currentTableId',1);
+                            }else {
+                                layer.alert("删除失败！")
+                            }
+                        }
+                    })
+                });
+            }else if (layEvent==='edit'){
+                var index=layer.open({
+                            title:'修改'
+                            ,type:2
+                            ,shade:0.2
+                            ,maxmin:true
+                            ,shadeClose:true
+                            ,area:['100%','100%']
+                            ,content:'editdayexam.html'
+                            ,end:function (){
+                                tableFeresh('currentTableId',1);
+                            }
+                        })
+                return false;
+            }
+        })
+
+        //头部工具栏监听(批量删除、批量导入、批量导出)
+        table.on('toolbar(currentTableFilter)',function (obj){
+            var event = obj.event;
+            var checkStatus = table.checkStatus('currentTableId');
+            var data1 = checkStatus.data;
+            var trs = obj.tr;
+            var dayData = JSON.stringify(data1);
+            if(event==='deletebatch'){
+                layer.confirm("确定都删除吗？",function (index){
+                    layer.close(index);
+                    $.ajax({
+                        url:"/dayexam/delete.do",
+                        type:"POST",
+                        contentType:'application/json;charset=utf-8',
+                        data:dayData,
+                        success:function (data){
+                            if(data.code==10000){
+                                layer.alert("删除成功！")
+                                tableFeresh('currentTableId',1);
+                            }else {
+                                layer.alert("删除失败！")
+                            }
+                        }
+                    })
+
+                });
+            }else if(event==='exportbatch'){
+                location.href="/dayexam/export.do";
+            }else if(event=='addbatch'){
+                var index=layer.open({
+                        title:'导入Excel'
+                        ,type:2
+                        ,shade:0.2
+                        ,maxmin:true
+                        ,shadeClose:true
+                        ,area:['100%','100%']
+                        ,content:'uploaddayexam.html'
+                        ,end:function (){
+                            tableFeresh('currentTableId',1);
+                        }
+                    })
+            }else if(event=='add'){
+                var index=layer.open({
+                    title:'添加'
+                    ,type:2
+                    ,shade:0.2
+                    ,maxmin:true
+                    ,shadeClose:true
+                    ,area:['100%','100%']
+                    ,content:'adddayexam.html'
+                    ,end:function (){
+                        tableFeresh('currentTableId',1);
+                    }
+                })
+            }
+        })
+    });
+</script>
 
 </body>
 </html>
