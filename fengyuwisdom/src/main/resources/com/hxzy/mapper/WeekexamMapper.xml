@@ -1,0 +1,274 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hxzy.mapper.WeekexamMapper" >
+  <resultMap id="BaseResultMap" type="com.hxzy.entity.Weekexam" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="sid" property="sid" jdbcType="INTEGER" />
+    <result column="score" property="score" jdbcType="INTEGER" />
+    <result column="info" property="info" jdbcType="VARCHAR" />
+    <result column="week" property="week" jdbcType="INTEGER" />
+    <result column="ctime" property="ctime" jdbcType="DATE" />
+    <result property="name" column="name"/>
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.hxzy.entity.WeekexamExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    id, sid, score, info, week, ctime
+    from t_weekexam
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+
+  <!--传进来的对象去查是否存在-->
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" >
+    select
+      t_weekexam.*
+    from t_weekexam
+    where t_weekexam.sid = #{sid,jdbcType=INTEGER}
+      and t_weekexam.score = #{score,jdbcType=INTEGER}
+      and t_weekexam.week = #{week,jdbcType=INTEGER}
+  </select>
+<!--  批量删除-->
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from t_weekexam where
+        <foreach collection="sids" item="sid" separator="or">
+            sid =#{sid,jdbcType=INTEGER}
+        </foreach>
+  </delete>
+  <delete id="deleteByExample" parameterType="com.hxzy.entity.WeekexamExample" >
+    delete from t_weekexam
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.hxzy.entity.Weekexam" >
+    insert into t_weekexam (sid, score,
+      info, week, ctime
+      )
+    values (#{sid,jdbcType=INTEGER}, #{score,jdbcType=INTEGER},
+      #{info,jdbcType=VARCHAR}, #{week,jdbcType=INTEGER}, #{ctime,jdbcType=TIMESTAMP}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.hxzy.entity.Weekexam" >
+    insert into t_weekexam
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="sid != null" >
+        sid,
+      </if>
+      <if test="score != null" >
+        score,
+      </if>
+      <if test="info != null" >
+        info,
+      </if>
+      <if test="week != null" >
+        week,
+      </if>
+      <if test="ctime != null" >
+        ctime,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="sid != null" >
+        #{sid,jdbcType=INTEGER},
+      </if>
+      <if test="score != null" >
+        #{score,jdbcType=INTEGER},
+      </if>
+      <if test="info != null" >
+        #{info,jdbcType=VARCHAR},
+      </if>
+      <if test="week != null" >
+        #{week,jdbcType=INTEGER},
+      </if>
+      <if test="ctime != null" >
+        #{ctime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.hxzy.entity.WeekexamExample" resultType="java.lang.Integer" >
+    select count(*) from t_weekexam
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update t_weekexam
+    <set >
+      <if test="record.id != null" >
+        id = #{record.id,jdbcType=INTEGER},
+      </if>
+      <if test="record.sid != null" >
+        sid = #{record.sid,jdbcType=INTEGER},
+      </if>
+      <if test="record.score != null" >
+        score = #{record.score,jdbcType=INTEGER},
+      </if>
+      <if test="record.info != null" >
+        info = #{record.info,jdbcType=VARCHAR},
+      </if>
+      <if test="record.week != null" >
+        week = #{record.week,jdbcType=INTEGER},
+      </if>
+      <if test="record.ctime != null" >
+        ctime = #{record.ctime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update t_weekexam
+    set id = #{record.id,jdbcType=INTEGER},
+      sid = #{record.sid,jdbcType=INTEGER},
+      score = #{record.score,jdbcType=INTEGER},
+      info = #{record.info,jdbcType=VARCHAR},
+      week = #{record.week,jdbcType=INTEGER},
+      ctime = #{record.ctime,jdbcType=TIMESTAMP}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.hxzy.entity.Weekexam" >
+    update t_weekexam
+    <set >
+      <if test="sid != null" >
+        sid = #{sid,jdbcType=INTEGER},
+      </if>
+      <if test="score != null" >
+        score = #{score,jdbcType=INTEGER},
+      </if>
+      <if test="info != null" >
+        info = #{info,jdbcType=VARCHAR},
+      </if>
+      <if test="week != null" >
+        week = #{week,jdbcType=INTEGER},
+      </if>
+      <if test="ctime != null" >
+        ctime = #{ctime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+<!--  -->
+  <update id="updateByPrimaryKey" parameterType="com.hxzy.entity.Weekexam" >
+    update t_weekexam
+    left join t_student
+    on t_student.id=t_weekexam.sid
+    set t_weekexam.sid = #{sid,jdbcType=INTEGER},
+        t_weekexam.score = #{score,jdbcType=INTEGER},
+        t_weekexam.info = #{info,jdbcType=VARCHAR},
+        t_weekexam.week = #{week,jdbcType=INTEGER},
+        t_weekexam.ctime = #{ctime,jdbcType=TIMESTAMP}
+    where t_student.name = #{name,jdbcType=INTEGER}
+        and t_weekexam.week = #{week,jdbcType=INTEGER}
+  </update>
+  <select id="queryByStu" resultMap="BaseResultMap">
+    select t_weekexam.*,
+           t_student.name
+    from t_weekexam
+           left join t_student
+                     on t_weekexam.sid=t_student.id
+    order by t_weekexam.id
+  </select>
+
+  <select id="queryByParam" resultMap="BaseResultMap">
+    select t_weekexam.*,t_student.name
+    from t_weekexam
+    left join t_student
+    on t_student.id=t_weekexam.sid
+    <where>
+      <if test="sid !=null and sid !=''">
+        and t_weekexam.sid=#{sid}
+      </if>
+      <if test="week !=null and week !=''">
+        and t_weekexam.week=#{week}
+      </if>
+    </where>
+  </select>
+  <delete id="deleteById">
+    delete
+    from t_weekexam
+    where sid=#{sid}
+  </delete>
+
+  <insert id="insertBatch">
+    insert into t_weekexam (sid,score,info,week,ctime)
+    values
+    <foreach collection="list" item="weekexam" separator=",">
+      (#{weekexam.sid},#{weekexam.score},#{weekexam.info},#{weekexam.week},#{weekexam.ctime})
+    </foreach>
+  </insert>
+</mapper>

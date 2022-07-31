@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hxzy.mapper.StudentDtoMapper" >
+
+  <select id="sexDates" resultType="com.hxzy.entity.StudentSexDto">
+    select sex,count(*) as count
+    from t_student
+    group by sex
+  </select>
+
+  <select id="hometownDatas" resultType="com.hxzy.entity.StudentHomeTownDto">
+    select hometown,count(*) as count
+    from t_student
+    group by hometown
+  </select>
+
+  <select id="educationDatas" resultType="com.hxzy.entity.StudentEducationDto">
+    select education,count(*) as count
+    from t_student
+    group by education
+  </select>
+</mapper>
