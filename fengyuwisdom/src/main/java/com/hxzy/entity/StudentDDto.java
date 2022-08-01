@@ -4,7 +4,7 @@ import lombok.Data;
 
 import java.util.Date;
 @Data
-public class StudentDto {
+public class StudentDDto {
 
     private Integer id;
 

@@ -3,7 +3,7 @@ package com.hxzy.controller;
 import com.hxzy.entity.ScoreDatas;
 import com.hxzy.entity.StudentSexDatas;
 import com.hxzy.service.ScoreService;
-import com.hxzy.service.StudentService;
+import com.hxzy.service.StudentDDService;
 import com.hxzy.util.RUtil;
 import com.hxzy.vo.R;
 import io.swagger.annotations.Api;
@@ -14,12 +14,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @Controller
 @RequestMapping("/statistics")
 @Api(value = "图表统计接口",description = "统计api")
 public class StudenInfotController {
     @Autowired
-    StudentService studentService;
+    StudentDDService studentService;
     @Autowired
     ScoreService scoreService;
     @RequestMapping("/studentSexInfo")
@@ -77,5 +80,21 @@ public class StudenInfotController {
     public R scoreStageAction(){
         ScoreDatas studentStageDatas = scoreService.getStudentStageDatas();
         return RUtil.ok(studentStageDatas);
+    }
+
+    //主页统计
+    @RequestMapping("/getCount")
+    @ResponseBody
+    public R getStudent(){
+        Integer count = studentService.getCount();
+        Integer gradeConut = studentService.getGradeConut();
+        Integer complaintConut = studentService.getComplaintConut();
+        Integer projectConut = studentService.getProjectConut();
+        Map<String, Integer> map = new HashMap<>();
+        map.put("student",count);
+        map.put("grade",gradeConut);
+        map.put("complaint",complaintConut);
+        map.put("project",projectConut);
+        return RUtil.ok(map);
     }
 }

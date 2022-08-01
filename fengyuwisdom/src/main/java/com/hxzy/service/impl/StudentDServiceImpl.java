@@ -4,8 +4,8 @@ import com.hxzy.entity.StudentEducationDto;
 import com.hxzy.entity.StudentHomeTownDto;
 import com.hxzy.entity.StudentSexDatas;
 import com.hxzy.entity.StudentSexDto;
-import com.hxzy.mapper.StudentDtoMapper;
-import com.hxzy.service.StudentService;
+import com.hxzy.mapper.InfoDtoMapper;
+import com.hxzy.service.StudentDDService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,10 +14,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 @Service
-public class StudentServiceImpl implements StudentService {
+public class StudentDServiceImpl implements StudentDDService {
 
     @Autowired
-    StudentDtoMapper studentDtoMapper;
+    InfoDtoMapper studentDtoMapper;
     //性别统计
     @Override
     public StudentSexDatas getStudentSex() {
@@ -83,6 +83,26 @@ public class StudentServiceImpl implements StudentService {
             return studentSexDatas;
         }
         return null;
+    }
+    //学生个数
+    @Override
+    public Integer getCount() {
+        return studentDtoMapper.getCount();
+    }
+
+    @Override
+    public Integer getGradeConut() {
+        return studentDtoMapper.getGradeConut();
+    }
+
+    @Override
+    public Integer getComplaintConut() {
+        return studentDtoMapper.getComplaintConut();
+    }
+
+    @Override
+    public Integer getProjectConut() {
+        return studentDtoMapper.getProjectConut();
     }
 
     public String getSexByInt(Integer sexId) {

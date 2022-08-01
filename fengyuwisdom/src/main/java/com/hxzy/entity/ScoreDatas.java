@@ -12,4 +12,5 @@ public class ScoreDatas {
     private List<List<Object>> scoreWeek;
 
     private List<List<Object>> scoreStage;
+
 }
