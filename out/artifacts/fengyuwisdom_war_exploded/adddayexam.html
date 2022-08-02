@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>锋豫智慧平台</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="lib/layui-v2.6.3/css/layui.css" media="all">
+    <link rel="stylesheet" href="css/public.css" media="all">
+</head>
+<body>
+<div class="layuimini-container">
+    <div class="layuimini-main">
+      <div class="layui-col-lg-offset3 layui-col-lg6">
+        <fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
+            <legend>添加日考成绩</legend>
+        </fieldset>
+        <form class="layui-form" action="" id="form-reset">
+            <div class="layui-form-item">
+                <label class="layui-form-label">学号：</label>
+                <div class="layui-input-block">
+                    <input type="text" name="sid" autocomplete="off" placeholder="请输入学号" class="layui-input" lay-verify="sid">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">成绩：</label>
+                <div class="layui-input-block">
+                    <input type="number" name="score" autocomplete="off" placeholder="请输入成绩" class="layui-input" lay-verify="score">
+                </div>
+            </div>
+			<div class="layui-form-item">
+			    <label class="layui-form-label">备注：</label>
+			    <div class="layui-input-block">
+			        <input type="text" name="info" autocomplete="off" placeholder="请输入评语" class="layui-input" lay-verify="info">
+			    </div>
+			</div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">日期：</label>
+                <div class="layui-input-block">
+                    <input type="text" name="cdate" id="cdate" autocomplete="off" class="layui-input" lay-verify="cdate" placeholder="例如：2000-01-01">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-input-block">
+                    <button class="layui-btn" lay-submit="" lay-filter="demo1">添加日考成绩</button>
+                    <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                </div>
+            </div>
+        </form>
+		</div>
+    </div>
+</div>
+<script src="lib/jquery-3.4.1/jquery-3.4.1.min.js"></script>
+<script src="lib/layui-v2.6.3/layui.js" charset="utf-8"></script>
+<script>
+    layui.use(['form','jquery','laydate'],function (){
+        var form=layui.form,
+            laydate=layui.laydate,
+            $=layui.jquery;
+        //格式验证
+        laydate.render({
+            elem:'#cdate'
+        })
+        form.verify({
+            sid: [
+                /^\d{4}$/
+            ,'学号必须是4位纯数字'
+            ]
+            ,score:[
+                /^(?:0|[1-9][0-9]?|100)(\.[0-9]{0,2})?$/
+                ,'分数必须是0-100之间'
+            ]
+            ,info: [
+                /[a-zA-Z\u4E00-\u9FA5]+$/
+                ,'必须是中文或英文'
+            ]
+            ,cdate:[
+                /^((((1[6-9]|[2-9]\d)\d{2})-(0?[13578]|1[02])-(0?[1-9]|[12]\d|3[01]))|(((1[6-9]|[2-9]\d)\d{2})-(0?[13456789]|1[012])-(0?[1-9]|[12]\d|30))|(((1[6-9]|[2-9]\d)\d{2})-0?2-(0?[1-9]|1\d|2[0-8]))|(((1[6-9]|[2-9]\d)(0[48]|[2468][048]|[13579][26])|((16|[2468][048]|[3579][26])00))-0?2-29-))$/
+                ,'格式：2000-01-01'
+            ]
+        });
+        //表单提交
+        form.on('submit(demo1)',function (data){
+            var field = data.field;
+            var insertDay = JSON.stringify(field);
+            $.ajax({
+                url:"/dayexam/insert.do",
+                type:"POST",
+                contentType:'application/json;charset=utf-8',
+                data:insertDay,
+                success:function (data){
+                    if (data.code==10000){
+                        layer.alert("添加成功");
+                        $("#form-reset")[0].reset();
+                        var frameIndex = parent.layer.getFrameIndex(window.name);
+                        parent.layer.close(frameIndex);
+                    }else {
+                        layer.alert("添加失败");
+                    }
+                }
+            })
+            return false;
+        })
+    })
+</script>
+    
+
+</body>
+</html>
