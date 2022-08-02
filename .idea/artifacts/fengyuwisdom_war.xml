@@ -1,0 +1,14 @@
+<component name="ArtifactManager">
+  <artifact type="war" name="fengyuwisdom:war">
+    <output-path>$PROJECT_DIR$/fengyuwisdom/target</output-path>
+    <properties id="maven-jee-properties">
+      <options>
+        <module>fengyuwisdom</module>
+        <packaging>war</packaging>
+      </options>
+    </properties>
+    <root id="archive" name="fengyuwisdom-1.0-SNAPSHOT.war">
+      <element id="artifact" artifact-name="fengyuwisdom:war exploded" />
+    </root>
+  </artifact>
+</component>

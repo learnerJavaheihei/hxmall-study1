@@ -19,4 +19,6 @@ public class Admin {
     private String captcha;
 
     private String account;
+
+    private String email;
 }
