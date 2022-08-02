@@ -2,15 +2,19 @@ package com.hxzy.service.impl;
 
 import com.hxzy.config.SysConfig;
 import com.hxzy.entity.Admin;
+import com.hxzy.entity.AdminExample;
 import com.hxzy.mapper.AdminMapper;
 import com.hxzy.service.AdminService;
 import com.hxzy.util.RUtil;
+import com.hxzy.vo.PageBean;
 import com.hxzy.vo.R;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
 
 import javax.servlet.http.HttpSession;
+import java.util.List;
 
 
 @Service
@@ -41,4 +45,53 @@ public class AdminServiceImpl  implements AdminService {
 
         return RUtil.fail();
     }
+    //分页查询
+    @Override
+    public PageBean querylist() {
+        List<Admin> list = adminMapper.selectByExample(new AdminExample());
+        return new PageBean(0,"",list.size(),list);
+    }
+    //新增
+    @Override
+    public R sava(Admin admin) {
+        if(admin !=null && admin.getName() !=null){
+            //密码加密
+            admin.setPassword(DigestUtils.md5DigestAsHex(admin.getPassword().getBytes()));
+            if(adminMapper.insert(admin) !=1){
+                return RUtil.ok();
+            }
+        }
+        return RUtil.fail();
+    }
+
+    //删除
+    @Override
+    public R delete(@Param("id") Integer id) {
+        int i = adminMapper.deleteByPrimaryKey(id);
+        return RUtil.ok();
+    }
+
+    //批量删除
+    @Override
+    public int deleteall(List<Integer> ids) {
+        return adminMapper.deleteByPrimaryKeys(ids);
+    }
+
+    //修改
+    @Override
+    public int update(Admin admin) {
+        return adminMapper.updateByPrimaryKey(admin);
+    }
+    //修改中的查询
+    @Override
+    public Admin queryBySid(Admin admin) {
+        return adminMapper.selectByPrimaryKey(admin);}
+
+    //搜索
+    @Override
+    public PageBean queryByParam(String name, String no) {
+        List<Admin> list = adminMapper.queryByParam(name, no);
+        return new PageBean(0,"",list.size(),list);
+    }
+
 }

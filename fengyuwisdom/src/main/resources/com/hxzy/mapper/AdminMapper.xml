@@ -66,12 +66,15 @@
       </foreach>
     </where>
   </sql>
+  <sql id="Base_Column_List" >
+    id, name, no, password, flag
+  </sql>
   <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.hxzy.entity.AdminExample" >
     select
     <if test="distinct" >
       distinct
     </if>
-    id, name, no, password, flag
+    <include refid="Base_Column_List" />
     from t_admin
     <if test="_parameter != null" >
       <include refid="Example_Where_Clause" />
@@ -80,11 +83,14 @@
       order by ${orderByClause}
     </if>
   </select>
-  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+  <!---->
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap">
     select
-      id, name, no, password, flag
+      name, no,flag
     from t_admin
-    where id = #{id,jdbcType=INTEGER}
+    where name = #{name}
+      and no=#{no}
+      and flag=#{flag}
   </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
     delete from t_admin
@@ -97,10 +103,10 @@
     </if>
   </delete>
   <insert id="insert" parameterType="com.hxzy.entity.Admin" >
-    insert into t_admin (id, name, no, 
-      password, flag)
-    values (#{id,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, #{no,jdbcType=VARCHAR}, 
-      #{password,jdbcType=VARCHAR}, #{flag,jdbcType=INTEGER})
+    insert into t_admin (id, name, no,
+                         password, flag)
+    values (#{id,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, #{no,jdbcType=VARCHAR},
+            #{password,jdbcType=VARCHAR}, #{flag,jdbcType=INTEGER})
   </insert>
   <insert id="insertSelective" parameterType="com.hxzy.entity.Admin" >
     insert into t_admin
@@ -171,10 +177,10 @@
   <update id="updateByExample" parameterType="map" >
     update t_admin
     set id = #{record.id,jdbcType=INTEGER},
-      name = #{record.name,jdbcType=VARCHAR},
-      no = #{record.no,jdbcType=VARCHAR},
-      password = #{record.password,jdbcType=VARCHAR},
-      flag = #{record.flag,jdbcType=INTEGER}
+    name = #{record.name,jdbcType=VARCHAR},
+    no = #{record.no,jdbcType=VARCHAR},
+    password = #{record.password,jdbcType=VARCHAR},
+    flag = #{record.flag,jdbcType=INTEGER}
     <if test="_parameter != null" >
       <include refid="Update_By_Example_Where_Clause" />
     </if>
@@ -200,12 +206,32 @@
   <update id="updateByPrimaryKey" parameterType="com.hxzy.entity.Admin" >
     update t_admin
     set name = #{name,jdbcType=VARCHAR},
-      no = #{no,jdbcType=VARCHAR},
-      password = #{password,jdbcType=VARCHAR},
-      flag = #{flag,jdbcType=INTEGER}
+        no = #{no,jdbcType=VARCHAR},
+        flag = #{flag,jdbcType=INTEGER}
     where id = #{id,jdbcType=INTEGER}
   </update>
-  <select id="selectByName" resultType="com.hxzy.entity.Admin">
-    select  * from t_admin where t_admin.name = #{account}
+  <select id="selectByName" resultMap="BaseResultMap">
+    select  * from t_admin where name = #{account}
   </select>
+  <!--搜索-->
+  <select id="queryByParam" resultMap="BaseResultMap">
+    select t_admin.*
+    from t_admin
+
+    <where>
+      <if test="name !=null and name !=''">
+        and t_admin.name =#{name}
+      </if>
+      <if test="no !=null and no !=''">
+        and t_admin.no=#{no}
+      </if>
+    </where>
+  </select>
+  <!--批量删除-->
+  <delete id="deleteByPrimaryKeys" parameterType="java.lang.Integer" >
+    delete from t_admin where
+    <foreach collection="ids" item="id" separator="or">
+      id =#{id,jdbcType=INTEGER}
+    </foreach>
+  </delete>
 </mapper>

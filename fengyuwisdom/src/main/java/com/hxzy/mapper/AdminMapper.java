@@ -12,13 +12,15 @@ public interface AdminMapper {
 
     int deleteByPrimaryKey(Integer id);
 
+    int deleteByPrimaryKeys(@Param("ids") List<Integer> ids);
+
     int insert(Admin record);
 
     int insertSelective(Admin record);
 
     List<Admin> selectByExample(AdminExample example);
 
-    Admin selectByPrimaryKey(Integer id);
+    Admin selectByPrimaryKey(Admin admin);
 
     int updateByExampleSelective(@Param("record") Admin record, @Param("example") AdminExample example);
 
@@ -29,4 +31,6 @@ public interface AdminMapper {
     int updateByPrimaryKey(Admin record);
 
     Admin selectByName(@Param("account") String account);
+
+    List<Admin> queryByParam(@Param("name") String name,@Param("no") String no);
 }
