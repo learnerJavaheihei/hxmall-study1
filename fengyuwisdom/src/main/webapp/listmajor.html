@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>锋豫智慧平台</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="lib/layui-v2.6.3/css/layui.css" media="all">
+    <link rel="stylesheet" href="css/public.css" media="all">
+</head>
+<body>
+<div class="layuimini-container">
+    <div class="layuimini-main">
+
+        <fieldset class="table-search-fieldset">
+            <legend>搜索信息</legend>
+            <div style="margin: 10px 10px 10px 10px">
+                <form class="layui-form layui-form-pane" action="">
+                    <div class="layui-form-item">
+                        <div class="layui-inline">
+                            <label class="layui-form-label">姓名</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="sname" id="sname" lay-verify="required" autocomplete="off" class="layui-input">
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <label class="layui-form-label">地址</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="major" id="major" autocomplete="off" class="layui-input">
+                            </div>
+                        </div>
+
+                        <div class="layui-inline">
+                            <button type="button" class="layui-btn layui-btn-primary"  lay-submit lay-filter="data-search-btn"><i class="layui-icon"></i> 搜 索</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </fieldset>
+
+        <script type="text/html" id="toolbarDemo">
+            <div class="layui-btn-container">
+                <button class="layui-btn layui-btn-normal layui-btn-sm data-add-btn" lay-event="add"> 添加 </button>
+                <button class="layui-btn layui-btn-sm layui-btn-danger data-delete-btn" lay-event="delete"> 删除 </button>
+                <button class="layui-btn layui-btn-sm layui-btn-danger data-delete-btn" lay-event="export"> excel导出</button>
+            </div>
+        </script>
+
+        <table class="layui-hide" id="currentTableId" lay-filter="currentTableFilter">
+
+
+        </table>
+
+        <script type="text/html" id="currentTableBar">
+            <a class="layui-btn layui-btn-normal layui-btn-xs data-count-edit" lay-event="edit"> 编辑 </a>
+            <a class="layui-btn layui-btn-xs layui-btn-danger data-count-delete" lay-event="delete">删除</a>
+        </script>
+
+    </div>
+</div>
+<script src="lib/jquery-3.4.1/jquery-3.4.1.min.js" charset="utf-8"></script>
+<script src="lib/layui-v2.6.3/layui.js" charset="utf-8"></script>
+<script src="lib/jq-module/jquery.particleground.min.js" charset="utf-8"></script>
+<script>
+    layui.use(['table', 'form', 'layer'], function () {
+        var table=layui.table,
+            form=layui.form,
+            layer=layui.layer;
+        table.render({
+            elem:'#currentTableId',
+            height:312,
+            url:'/api/major/select.do',
+            toolbar:'#toolbarDemo',
+            page:true,//开启分页
+            defaultToolbar: ['filter','exports','print',{
+            title:'提示',
+            layEvent:'LAYTABLE_TIPS',
+            icon:'layui-icon-tips'
+        }],
+            cols:[[
+                {type:'checkbox',width: 120},
+                {field:'uuid',title: "ID" ,Width:110,sort:true},
+                {field:'sname',title: "学生姓名" ,Width:110,sort:true},
+                {field:'major',title: "大学的专业" ,Width:110,sort:true},
+                {field:'adress',title: "就读省份" ,Width:110,sort:true},
+                {field:'info',title: "成绩优良" ,Width:110,sort:true},
+                {title:'操作',minWidth: 150,toolbar:'#currentTableBar'}
+
+            ]],
+            //每页条数的选择
+            limis: [10,15,30],
+            limit:2,
+        })
+
+        function tableFresh(ele,num){
+            table.reload(ele,{
+
+                page:{
+                    curr:num// 重新从第 1 页开始
+                },
+                where:{
+                    //设定异步数据接口的额外参数，任意设
+                }
+            },'data') ///只重载数据
+        }
+        //搜索
+        form.on('submit(data-search-btn)',function (){
+            table.reload('currentTableId',{
+                url:"/api/major/selectAll.do",
+                method:"GET",
+                where:{
+                    //设定异步数据接口的额外参数，任意设
+                    sname:$("#sname").val(),
+                    major:$("#major").val(),
+                },
+                page:{
+                    curr:1 // 重新从第 1 页开始
+                }
+            }); ///只重载数据
+            return false;
+        })
+
+        ////table.on('event(filter)', callback); //事件。event 为内置事件名,filter 为容器 lay-filter 设定的值
+        table.on('toolbar(currentTableFilter)',function (obj){
+            switch (obj.event){
+                case'add':
+                    insertAll()
+                    break;
+                case'delete':
+                    deleteAll()
+                    break;
+            }
+        })
+
+        //添加
+        function insertAll(){
+            var index=layer.open({
+                title:'添加专业',
+                type:2,
+                shade:0.2,
+                maxmin:true,
+                shadeClose:true,
+                area:['100%','100%'],
+                content:'addmajor.html'
+            })
+            //重置事件
+            $(window).on('resize',function (){
+                layer.full(index);
+            })
+        }
+        //批量删除
+        function  deleteAll(){
+            //当前选中状态
+            var checkStatus=table.checkStatus('currentTableId')
+            //选中状态数据
+            var data = checkStatus.data;
+             // var data=JSON.stringify(res);
+             if(data.length>0){
+                 //定义数组，保存选中行的id
+                 var idAdrr=[];
+                 for(let i=0;i<data.length;i++){
+                     // 将选中的ID值添加到数组的末尾
+                     idAdrr.push(data[i].uuid);
+                 }
+                 var   ids=idAdrr.join("-")
+                 console.log(idAdrr)
+                 layer.confirm('确定删除选中的'+data.length+'个用户吗？',{icon:3,title:'提示信息'},function (){
+                     $.ajax({
+                         url:"api/major/delete.do"+ids,
+                         type: "POST",
+                         dataType: "json",
+                         success:function (result){
+                             if (result.code == 10000) {
+                                 layer.msg('删除成功')
+                                 tableFresh('currentTableId',1)
+                                 // layer.close(index);
+
+                             }else {
+                                 layer.msg("删除失败", function () {
+                                     time:2000
+                                 });
+                             }
+                         }
+                     })
+                 })
+             }else {
+                 layer.msg("请选择要删除的用户");
+             }
+        }
+
+
+
+        table.on('tool(currentTableFilter)',function (obj){
+            //本地持久化，将当前数据保持在磁盘中
+            var data = obj.data;
+            //key，vaule 形式保存
+            localStorage.setItem("user",JSON.stringify(data));
+            //event 事件对象
+            if (obj.event === 'edit'){
+                var index = layer.open({
+                    title:'编辑用户',
+                    type:2,
+                    shade:0.2,
+                    maxmin:true,
+                    shadeClose:true,
+                    area:['100%','100%'],
+                    content:'editmajor.html'
+                    ,end:function (){
+                        tableFresh('currentTableId',1);
+                    }
+
+                })
+
+
+                $(window).on('resize',function (){
+                    layer.full(index);
+                })
+                return false;
+            }else if (obj.event === 'delete'){
+                layer.confirm('真的删除该行数据吗',function (index){
+                    // console.log(data);
+                    $.ajax({
+                        url:"api/major/delete.do",
+                        type:"POST",
+                        data:{"uuid":data.uuid},
+                        dataType:"json",
+                    })
+                    obj.del();
+                    //关闭弹出框
+                    layer.close(index);
+                })
+
+            }
+
+        })
+
+
+
+    })
+</script>
+
+</body>
+</html>

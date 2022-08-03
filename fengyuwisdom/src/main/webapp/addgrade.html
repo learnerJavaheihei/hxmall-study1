@@ -12,66 +12,128 @@
 <body>
 <div class="layuimini-container">
     <div class="layuimini-main">
-      <div class="layui-col-lg-offset3 layui-col-lg6">
-        <fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
-            <legend>添加班级</legend>
-        </fieldset>
-        <form class="layui-form" action="">
-            <div class="layui-form-item">
-                <label class="layui-form-label">名称：</label>
-                <div class="layui-input-block">
-                    <input type="text" name="name" lay-verify="name" autocomplete="off" placeholder="请输入班级的名称" class="layui-input">
+        <div class="layui-col-lg-offset3 layui-col-lg6">
+            <fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
+                <legend>添加班级</legend>
+            </fieldset>
+            <form class="layui-form" action="">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">名称：</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="name" lay-verify="name"  autocomplete="off" placeholder="请输入学生姓名"
+                               class="layui-input">
+                    </div>
                 </div>
-            </div>
-            <div class="layui-form-item">
-                <label class="layui-form-label">位置：</label>
-                <div class="layui-input-block">
-                    <input type="text" name="address" lay-verify="address" autocomplete="off" placeholder="请输入教室的位置" class="layui-input">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">位置：</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="address" lay-verify="address" lay-verify="required" autocomplete="off" placeholder="请输入教室的位置"
+                               class="layui-input">
+                    </div>
                 </div>
-            </div>
-            <div class="layui-form-item">
-                <label class="layui-form-label">学科：</label>
-                <div class="layui-input-block">
-                    <select name="sid" >
-                        <option value="1">Java</option>
-                        <option value="2">Html5</option>
-                        <option value="3">大数据</option>
-                        <option value="4">Python</option>
-                        <option value="5">云计算</option>
-                        <option value="6">UI设计</option>
-                    </select>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">学科：</label>
+                    <div class="layui-input-block">
+                        <select name="sid">
+                            <option value="1">Java</option>
+                            <option value="2">Html5</option>
+                            <option value="3">大数据</option>
+                            <option value="4">Python</option>
+                            <option value="5">云计算</option>
+                            <option value="6">UI设计</option>
+                        </select>
+                    </div>
                 </div>
-            </div>
-            <div class="layui-form-item">
-                <label class="layui-form-label">容量：</label>
-                <div class="layui-input-block">
-                    <input type="number" name="apacity" autocomplete="off" placeholder="请输入教室的容量" class="layui-input">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">容量：</label>
+                    <div class="layui-input-block">
+                        <input type="number" name="apacity" lay-verify="required" autocomplete="off"
+                               placeholder="请输入教室的容量" class="layui-input">
+                    </div>
                 </div>
-            </div>
-            <div class="layui-inline">
-                <label class="layui-form-label">开班日期</label>
-                <div class="layui-input-inline">
-                    <input type="text" name="sdate" id="date1" placeholder="yyyy-MM-dd" autocomplete="off" class="layui-input">
+                <div class="layui-inline">
+                    <label class="layui-form-label">开班日期</label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="sdate" id="sdate" lay-verify="required" placeholder="yyyy-MM-dd"
+                               autocomplete="off" class="layui-input">
+                    </div>
                 </div>
-            </div>
-            <div class="layui-inline">
-                <label class="layui-form-label">毕业日期</label>
-                <div class="layui-input-inline">
-                    <input type="text" name="edate" id="date2" placeholder="yyyy-MM-dd" autocomplete="off" class="layui-input">
+                <div class="layui-inline">
+                    <label class="layui-form-label">毕业日期</label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="edate" id="edate" lay-verify="required" placeholder="yyyy-MM-dd"
+                               autocomplete="off" class="layui-input">
+                    </div>
                 </div>
-            </div>
-            <div class="layui-form-item">
-                <div class="layui-input-block">
-                    <button class="layui-btn" lay-submit="" lay-filter="demo1">添加学科</button>
-                    <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                <div class="layui-form-item">
+                    <div class="layui-input-block">
+                        <button class="layui-btn" lay-submit="" lay-filter="demo1">添加学科</button>
+                        <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                    </div>
                 </div>
-            </div>
-        </form>
-		</div>
+
+            </form>
+        </div>
     </div>
 </div>
-<script src="lib/jquery-3.4.1/jquery-3.4.1.min.js"></script>
+<script src="lib/jquery-3.4.1/jquery-3.4.1.min.js" charset="utf-8"></script>
 <script src="lib/layui-v2.6.3/layui.js" charset="utf-8"></script>
+<script>
+    layui.use(['form', 'laydate'], function () {
+        var form = layui.form,
+            layer = layui.layer,
+            laydate = layui.laydate;
+
+        form.verify({
+            name: function (value, item) { //value：表单的值、item：表单的DOM对象
+                if (!new RegExp("^[a-zA-Z0-9_\u4e00-\u9fa5\\s·]+$").test(value)) {
+                    return '姓名不能有特殊字符及用户名不为空';
+                }
+                if (/(^\_)|(\__)|(\_+$)/.test(value)) {
+                    return '姓名首尾不能出现下划线\'_\'';
+                }
+                if (/^\d+\d+\d$/.test(value)) {
+                    return '姓名不能全为数字';
+                }
+
+            }
+
+            //我们既支持上述函数式的方式，也支持下述数组的形式
+            //数组的两个值分别代表：[正则匹配、匹配不符时的提示文字]
+            , address: [
+                /^[\S]{1,12}$/
+                , '地区必须1到12位，且不能出现空格'
+            ]
+
+        });
+        laydate.render({
+            elem: '#sdate' //指定元素
+        });
+
+        laydate.render({
+            elem: '#edate' //指定元素
+        });
+        form.on('submit(demo1)', function (data) {
+            var param = data.field;
+            $.ajax({
+                url: "/api/class/insert.do",
+                type: "POST",
+                dataType: "json",
+                data: param,
+                success: function (res) {
+                    if (res.code == 10000) {
+                        window.location = "/listgrade.html"
+                    } else {
+                        layer.alert("新增失败", {
+                            title: '添加失败'
+                        })
+                    }
+                }
+            })
+            return false;
+        })
+    })
+</script>
 
 
 </body>

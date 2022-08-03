@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>锋豫智慧平台</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="lib/layui-v2.6.3/css/layui.css" media="all">
+    <link rel="stylesheet" href="css/public.css" media="all">
+    <style>
+        .layui-form-item .layui-input-company {width: auto;padding-right: 10px;line-height: 38px;}
+    </style>
+</head>
+
+<body>
+<div class="layuimini-container">
+    <div class="layuimini-main">
+        <div class="layui-form layuimini-form" lay-filter = "lister">
+            <div class="layui-form-item">
+                <div class="layui-input-block">
+                    <input type="hidden" name="uuid"  lay-verify="required" autocomplete="off" placeholder="" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">学生姓名：</label>
+                <div class="layui-input-block">
+                    <input type="text" name="sname"  lay-verify="required" autocomplete="off" placeholder="请输入学生姓名" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">专业名称：</label>
+                <div class="layui-input-block">
+                    <input type="text" name="major" lay-verify="required" autocomplete="off" placeholder="请输入专业名称" class="layui-input">
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label">毕业学校省份：</label>
+                <div class="layui-input-block">
+                    <input type="text" name="adress" lay-verify="adress" autocomplete="off" placeholder="请输入毕业" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">在校成绩：</label>
+                <div class="layui-input-block">
+                    <input type="radio" name="info" value="优秀" title="优秀" checked="">
+                    <input type="radio" name="info" value="良好" title="良好">
+                    <input type="radio" name="info" value="一般" title="一般">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-input-block">
+                    <button class="layui-btn  layui-btn-normal" lay-submit="" lay-filter="saveBtn">修改</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="lib/jquery-3.4.1/jquery-3.4.1.min.js" charset="utf-8"></script>
+<script src="lib/layui-v2.6.3/layui.js" charset="utf-8"></script>
+<script src="js/lay-config.js?v=1.0.4" charset="utf-8"></script>
+<script>
+    var json=localStorage.getItem("user")
+    var user=JSON.parse(json);
+    // console.log(user)
+    layui.use(['form','miniTab','laydate'],function (){
+        var form = layui.form,
+            miniTab = layui.miniTab,
+            layer = layui.layer,
+            laydate=layui.laydate;
+        form.val("lister",user)
+
+        form.verify({
+            sname: function (value, item) { //value：表单的值、item：表单的DOM对象
+                if (!new RegExp("^[a-zA-Z0-9_\u4e00-\u9fa5\\s·]+$").test(value)) {
+                    return '姓名不能有特殊字符及用户名不为空';
+                }
+                if (/(^\_)|(\__)|(\_+$)/.test(value)) {
+                    return '姓名首尾不能出现下划线\'_\'';
+                }
+                if (/^\d+\d+\d$/.test(value)) {
+                    return '姓名不能全为数字';
+                }
+            }
+            //我们既支持上述函数式的方式，也支持下述数组的形式
+            //数组的两个值分别代表：[正则匹配、匹配不符时的提示文字]
+            , address: [
+                /^[\S]{1,12}$/
+                , '地区必须1到12位，且不能出现空格'
+            ]
+        });
+
+        form.on('submit(saveBtn)',function (data){
+            $.post("/api/major/update.do",data.field,function (res){
+                if (res.code ==10000){
+                    let frameIndex = parent.layer.getFrameIndex(window.name);
+                    parent.layer.close(frameIndex);
+                }else {
+                    layer.alert('修改失败',{
+                        title:"修改失败"
+                    })
+                }
+            })
+
+            return false;
+        })
+
+    })
+</script>
+</body>
+</html>

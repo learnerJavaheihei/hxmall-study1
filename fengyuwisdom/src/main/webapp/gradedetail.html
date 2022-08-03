@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>锋豫智慧平台</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="lib/layui-v2.6.3/css/layui.css" media="all">
+    <link rel="stylesheet" href="css/public.css" media="all">
+    <style>
+        .layui-form-item .layui-input-company {width: auto;padding-right: 10px;line-height: 38px;}
+    </style>
+</head>
+<body>
+<div class="layuimini-container">
+    <div class="layuimini-main">
+        <div class="layui-form layuimini-form" lay-filter = "lister">
+            <div class="layui-form-item">
+                <div class="layui-input-block">
+                    <input type="hidden" name="id"  lay-verify="required" autocomplete="off" placeholder="请输入学生姓名" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">名称：</label>
+                <div class="layui-input-block">
+                    <input type="text" name="name"  lay-verify="required" autocomplete="off" placeholder="请输入学生姓名" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">位置：</label>
+                <div class="layui-input-block">
+                    <input type="text" name="address" lay-verify="required" autocomplete="off" placeholder="请输入教室的位置" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">学科：</label>
+                <div class="layui-input-block">
+                    <select name="sid">
+                        <option value="1">Java</option>
+                        <option value="2">Html5</option>
+                        <option value="3">大数据</option>
+                        <option value="4">Python</option>
+                        <option value="5">云计算</option>
+                        <option value="6">UI设计</option>
+                    </select>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">容量：</label>
+                <div class="layui-input-block">
+                    <input type="number" name="apacity" lay-verify="required" autocomplete="off" placeholder="请输入教室的容量" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">开班日期</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="sdate" id="sdate" lay-verify="required" placeholder="yyyy-MM-dd"
+                           autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">毕业日期</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="edate" id="edate" lay-verify="required" placeholder="yyyy-MM-dd"
+                           autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-input-block">
+                    <button class="layui-btn  layui-btn-normal" lay-submit="" lay-filter="saveBtn">修改</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="lib/jquery-3.4.1/jquery-3.4.1.min.js" charset="utf-8"></script>
+<script src="lib/layui-v2.6.3/layui.js" charset="utf-8"></script>
+<script src="js/lay-config.js?v=1.0.4" charset="utf-8"></script>
+<script>
+    var json=localStorage.getItem("user")
+    var user=JSON.parse(json);
+    console.log(user)
+    layui.use(['form','miniTab','laydate'],function (){
+        var form = layui.form,
+            miniTab = layui.miniTab,
+            layer = layui.layer,
+            laydate=layui.laydate;
+        laydate.render({
+            elem: '#sdate' //指定元素
+        });
+
+        laydate.render({
+            elem: '#edate' //指定元素
+        });
+        form.verify({
+            name: function (value, item) { //value：表单的值、item：表单的DOM对象
+                if (!new RegExp("^[a-zA-Z0-9_\u4e00-\u9fa5\\s·]+$").test(value)) {
+                    return '姓名不能有特殊字符及用户名不为空';
+                }
+                if (/(^\_)|(\__)|(\_+$)/.test(value)) {
+                    return '姓名首尾不能出现下划线\'_\'';
+                }
+                if (/^\d+\d+\d$/.test(value)) {
+                    return '姓名不能全为数字';
+                }
+
+            }
+
+            //我们既支持上述函数式的方式，也支持下述数组的形式
+            //数组的两个值分别代表：[正则匹配、匹配不符时的提示文字]
+            , address: [
+                /^[\S]{1,12}$/
+                , '地区必须1到12位，且不能出现空格'
+            ]
+
+        });
+        form.val("lister",user)
+
+        form.on('submit(saveBtn)',function (data){
+            $.post("/api/class/update.do",data.field,function (res){
+                if (res.code ==10000){
+                    let frameIndex = parent.layer.getFrameIndex(window.name);
+                    parent.layer.close(frameIndex);
+                }else {
+                    layer.alert('修改失败',{
+                        title:"修改失败"
+                    })
+                }
+            })
+            return false;
+        })
+
+    })
+</script>
+
+</body>
+</html>

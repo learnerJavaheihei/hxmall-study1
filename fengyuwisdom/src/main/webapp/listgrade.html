@@ -19,20 +19,20 @@
                 <form class="layui-form layui-form-pane" action="">
                     <div class="layui-form-item">
                         <div class="layui-inline">
-                            <label class="layui-form-label">用户姓名</label>
+                            <label class="layui-form-label">姓名</label>
                             <div class="layui-input-inline">
-                                <input type="text" name="username" autocomplete="off" class="layui-input">
+                                <input type="text" name="name" id="name" autocomplete="off" class="layui-input">
                             </div>
                         </div>
                         <div class="layui-inline">
-                            <label class="layui-form-label">用户性别</label>
+                            <label class="layui-form-label">班级</label>
                             <div class="layui-input-inline">
-                                <input type="text" name="sex" autocomplete="off" class="layui-input">
+                                <input type="text" name="address" id="address" autocomplete="off" class="layui-input">
                             </div>
                         </div>
 
                         <div class="layui-inline">
-                            <button type="submit" class="layui-btn layui-btn-primary"  lay-submit lay-filter="data-search-btn"><i class="layui-icon"></i> 搜 索</button>
+                            <button type="button" class="layui-btn layui-btn-primary"  lay-submit lay-filter="data-search-btn"><i class="layui-icon"></i> 搜 索 </button>
                         </div>
                     </div>
                 </form>
@@ -43,20 +43,225 @@
             <div class="layui-btn-container">
                 <button class="layui-btn layui-btn-normal layui-btn-sm data-add-btn" lay-event="add"> 添加 </button>
                 <button class="layui-btn layui-btn-sm layui-btn-danger data-delete-btn" lay-event="delete"> 删除 </button>
+                <button class="layui-btn layui-btn-sm layui-btn-danger data-delete-btn" lay-event="export"> excel导出 </button>
             </div>
         </script>
 
-        <table class="layui-hide" id="currentTableId" lay-filter="currentTableFilter"></table>
+
+        <table class="layui-hide" id="currentTableId" lay-filter="currentTableFilter">
+
+        </table>
 
         <script type="text/html" id="currentTableBar">
-            <a class="layui-btn layui-btn-normal layui-btn-xs data-count-edit" lay-event="edit">编辑</a>
+            <a class="layui-btn layui-btn-normal  layui-btn-xs data-count-edit" lay-event="edit">编辑</a>
             <a class="layui-btn layui-btn-xs layui-btn-danger data-count-delete" lay-event="delete">删除</a>
         </script>
 
     </div>
 </div>
+<script src="lib/jquery-3.4.1/jquery-3.4.1.min.js" charset="utf-8"></script>
 <script src="lib/layui-v2.6.3/layui.js" charset="utf-8"></script>
+<script src="lib/jq-module/jquery.particleground.min.js" charset="utf-8"></script>
+<script>
+    /*将表单模块导入 控件*/
+    layui.use(['table','form','layer'],function(){
+        var $ = layui.jquery;
+        var table = layui.table;
+        var form=layui.form;
+        var layer = layui.layer;
+
+        //第一个实例
+        table.render({
+            //指定原始 table 容器的选择器或 DOM，方法渲染方式必填
+            elem: '#currentTableId'
+            ,url:  '/api/class/all.do' //数据接口
+            ,page: true //开启分页
+            ,toolbar:"#toolbarDemo"
+            //该参数可自由配置头部工具栏右侧的图标按钮
+            ,defaultToolbar: ['filter','exports','print',{
+                title:'提示',
+                layEvent:'LAYTABLE_TIPS',
+                icon:'layui-icon-tips'
+            }]
+            ,cols: [[//表头
+                //field设定字段名。非常重要，且是表格数据列的唯一标识
+                {type:'checkbox',width: 120}
+                ,{field: 'id', title: 'ID', width:120, sort: true}
+                ,{field: 'name', title: '姓名', width:120}
+                ,{field: 'address', title: '班级', width:120}
+                ,{field: 'sid', title: '学科', width:120,templet:function (data){
+                        var  s=data.sid=data.subjectDto.ename
+                        return s;
+                    }}
+
+                ,{field: 'apacity', title: '教室容量', width: 120}
+                ,{field: 'sdate', title: '开班日期', width: 120}
+                ,{field: 'edate', title: '毕业日期', width: 120}
+                ,{title:'操作',minWidth: 150,toolbar:'#currentTableBar'}
+            ]],
+            //每页条数的选择项。
+            limis:[10, 15, 20, 25,],
+            //每页显示的条数。
+            limt:15,
+            skin: 'line'
+        });
+
+        function tableFresh(ele,num){
+            table.reload(ele,{
+
+                page:{
+                    curr:num// 重新从第 1 页开始
+                },
+                where:{
+                    //设定异步数据接口的额外参数，任意设
+                }
+            },'data') ///只重载数据
+        }
+
+        // 监听搜索  监听表单数据来操作按钮
+        form.on('submit(data-search-btn)',function (){
+            //当前容器的全部表单字段，名值对形式：{name: value}
+            //使用ajax提交搜索请求
+                table.reload('currentTableId',{
+                    url:"/api/class/select.do",
+                    method:"GET",
+                    where:{
+                        //设定异步数据接口的额外参数，任意设
+                        name:$(".layui-input").val(),
+                        address:$("#address").val(),
+                    },
+                    page:{
+                        curr:1 // 重新从第 1 页开始
+                    }
+                }); ///只重载数据
+            return false;
+        })
+        //表头监听提交，监听表格
+        //obj 对象当前表格数据
+        //table.on('event(filter)', callback); //事件。event 为内置事件名,filter 为容器 lay-filter 设定的值
+        table.on('toolbar(currentTableFilter)',function (obj){
+            //event 事件对象    添加的监听对象lay-event="add"
+            switch(obj.event){
+                case 'add':
+                    insertAll()
+                    break;
+                case 'delete':
+                    deleteAll()
+                    break;
+                case 'export':
+                    exportAll()
+                    break;
+            };
+
+        //添加
+       function insertAll(){
+               var index=layer.open({
+                   title:'添加班级',
+                   type:2,
+                   //动画效果
+                   shade:0.2,
+                   maxmin:true,
+                   shadeClose:true,
+                   area:['100%','100%'],
+                   content:'addgrade.html'
+
+               })
+               //重置事件
+               $(window).on('resize',function (){
+                   layer.full(index);
+               })
+       }
+        //删除
+            function deleteAll() {
+                //当前选中状态
+                var checkStauts = table.checkStatus('currentTableId'),
+                    data = checkStauts.data;
+                // //使用ajax请求后端
+                //JSON.stringify(data));
+                if (data.length > 0) {
+                    // 定义数组，保存选中行的ID
+                    var idArr = [];
+                    // 循环遍历获取选中行(目的是获取选中的每一行的ID值)
+                    for (let i = 0; i < data.length; i++) {
+                        // 将选中的ID值添加到数组的末尾
+                        idArr.push(data[i].id);
+                    }
+                    var ids = idArr.join("-")
+                    layer.confirm('确定删除选中的'+data.length+'个用户吗？', {icon: 3, title: '提示信息'}, function (index) {
+                        $.ajax({
+                            url: "api/class/deleteAll.do/" + ids,
+                            // data: {"ids": ids},
+                            type: "POST",
+                            dataType: "json",
+                            success: function (result) {
+                                if (result.code == 10000) {
+                                    layer.msg('删除成功')
+                                    tableFresh('currentTableId',1)
+
+                                } else {
+                                    layer.msg("删除失败", function () {
+                                        time:2000
+                                    });
+                                }
+                            }
+                        })
+                    })
+                } else {
+                    layer.msg("请选择需要删除的用户");  //如果未选择数据，则提示。
+                }
+            }
+        });
+        //导出文件
+        function exportAll(){
+            location.href="/api/class/downloadFile.do"
+        }
 
 
+        //修改
+        table.on('tool(currentTableFilter)',function (obj){
+            //本地持久化，将当前数据保持在磁盘中
+            var data = obj.data;
+
+            //key，vaule 形式保存
+            localStorage.setItem("user",JSON.stringify(data));
+            //event 事件对象
+            if (obj.event === 'edit'){
+                var index = layer.open({
+                    title:'编辑用户',
+                    type:2,
+                    shade:0.2,
+                    maxmin:true,
+                    shadeClose:true,
+                    area:['100%','100%'],
+                    content:'gradedetail.html'
+                    ,end:function (){
+                        tableFresh('currentTableId',1);
+                    }
+                })
+
+
+
+                $(window).on('resize',function (){
+                    layer.full(index);
+                })
+                return false;
+            }else if (obj.event === 'delete'){
+                layer.confirm('真的删除该行数据吗',function (index){
+                    // console.log(data);
+                    $.ajax({
+                        url:"api/class/delete.do",
+                        type:"POST",
+                        data:{"id":data.id},
+                        dataType:"json",
+                    })
+
+                    obj.del();
+                    //关闭弹出框
+                    layer.close(index);
+                })
+            }
+        })
+    });
+</script>
 </body>
 </html>

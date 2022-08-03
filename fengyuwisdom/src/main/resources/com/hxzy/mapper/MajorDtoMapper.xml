@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hxzy.mapper.MajorDtoMapper" >
+  <resultMap id="BaseResultMap" type="com.hxzy.entity.MajorDto" >
+    <result column="uuid" property="uuid" jdbcType="INTEGER" />
+    <result column="sname" property="sname" jdbcType="VARCHAR" />
+    <result column="major" property="major" jdbcType="VARCHAR" />
+    <result column="adress" property="adress" jdbcType="VARCHAR" />
+    <result column="info" property="info" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    uuid, sname, major, adress, info
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.hxzy.entity.MajorDtoExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from t_major
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <delete id="deleteByExample" parameterType="com.hxzy.entity.MajorDtoExample" >
+    delete from t_major
+    where
+    <foreach collection="ids" item="uuid" separator="or">
+      t_major.uuid=#{uuid}
+    </foreach>
+  </delete>
+  <insert id="insert" parameterType="com.hxzy.entity.MajorDto" >
+    insert into t_major (uuid, sname, major, 
+      adress, info)
+    values (#{uuid,jdbcType=INTEGER}, #{sname,jdbcType=VARCHAR}, #{major,jdbcType=VARCHAR}, 
+      #{adress,jdbcType=VARCHAR}, #{info,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.hxzy.entity.MajorDto" >
+    insert into t_major
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="uuid != null" >
+        uuid,
+      </if>
+      <if test="sname != null" >
+        sname,
+      </if>
+      <if test="major != null" >
+        major,
+      </if>
+      <if test="adress != null" >
+        adress,
+      </if>
+      <if test="info != null" >
+        info,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="uuid != null" >
+        #{uuid,jdbcType=INTEGER},
+      </if>
+      <if test="sname != null" >
+        #{sname,jdbcType=VARCHAR},
+      </if>
+      <if test="major != null" >
+        #{major,jdbcType=VARCHAR},
+      </if>
+      <if test="adress != null" >
+        #{adress,jdbcType=VARCHAR},
+      </if>
+      <if test="info != null" >
+        #{info,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.hxzy.entity.MajorDtoExample" resultType="java.lang.Integer" >
+    select count(*) from t_major
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update t_major
+    <set >
+      <if test="record.uuid != null" >
+        uuid = #{record.uuid,jdbcType=INTEGER},
+      </if>
+      <if test="record.sname != null" >
+        sname = #{record.sname,jdbcType=VARCHAR},
+      </if>
+      <if test="record.major != null" >
+        major = #{record.major,jdbcType=VARCHAR},
+      </if>
+      <if test="record.adress != null" >
+        adress = #{record.adress,jdbcType=VARCHAR},
+      </if>
+      <if test="record.info != null" >
+        info = #{record.info,jdbcType=VARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update t_major
+    set uuid = #{record.uuid,jdbcType=INTEGER},
+      sname = #{record.sname,jdbcType=VARCHAR},
+      major = #{record.major,jdbcType=VARCHAR},
+      adress = #{record.adress,jdbcType=VARCHAR},
+      info = #{record.info,jdbcType=VARCHAR}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+
+
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.hxzy.entity.MajorDto" >
+    update t_major
+    set uuid = #{uuid,jdbcType=VARCHAR},
+        sname = #{sname,jdbcType=VARCHAR},
+        major = #{major,jdbcType=INTEGER},
+        adress = #{adress,jdbcType=INTEGER},
+        info = #{info,jdbcType=DATE}
+    where uuid = #{uuid,jdbcType=INTEGER}
+  </update>
+
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from t_major
+    where uuid = #{uuid,jdbcType=INTEGER}
+  </delete>
+  <select id="selectData" resultMap="BaseResultMap">
+    select  * from  t_major
+<where>
+  <if test="sname!=null">
+   sname like '%${sname}%'
+  </if>
+  <if test="sname!=null">
+    and major like '%${major}%'
+  </if>
+</where>
+  </select>
+</mapper>
