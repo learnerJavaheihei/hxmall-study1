@@ -41,7 +41,6 @@
             <div class="layui-btn-container">
                 <button class="layui-btn layui-btn-normal layui-btn-sm data-add-btn" lay-event="add"> 添加 </button>
                 <button class="layui-btn layui-btn-sm layui-btn-danger data-delete-btn" lay-event="addbatch"> 批量导入 </button>
-                <button class="layui-btn layui-btn-sm layui-btn-danger data-delete-btn" lay-event="createtop"> 生成榜单 </button>
             </div>
         </script>
 
@@ -54,7 +53,138 @@
     </div>
 </div>
 <script src="lib/layui-v2.6.3/layui.js" charset="utf-8"></script>
+<script>
+    layui.use(['table', 'form'], function () {
+        var $ = layui.jquery,
+            form = layui.form,
+            table = layui.table;
 
+        //第一个实例
+        table.render({
+            elem: '#currentTableId'
+            , url: '/api/student_job/all1.do' //数据接口
+            , page: true //开启分页
+            , toolbar:"#toolbarDemo"
+            ,defaultToolbar: ['filter','exports','print',{
+                title:'提示',
+                layEvent:'LAYTABLE_TIPS',
+                icon:'layui-icon-tips'
+            }]
+            , cols: [[ //表头
+                {type: 'checkbox', width: 120}
+                ,{field: 'id', title: '编号', width: 120}
+                , {field: 'sid', title: '学号', width: 120}
+                , {field: 'salary', title: '薪资', width: 120},
+                {field: 'edu', title: '学历', width: 120},
+                {field: 'company',title: '公司',width: 120},
+                {field: 'city',title: '城市',width: 120},
+                {field: 'school',title: '学校',width: 120},
+                {field: 'jobdate',title: '入职时间',width: 120},
+
+                {title: '操作', minWidth: 150, toolbar: '#currentTableBar'}
+            ]],
+            limits: [10, 15, 20, 25, 50],
+            limit: 15,
+            skin: 'line'
+
+        });
+        //搜索
+        form.on('submit(data-search-btn)',function (){
+            var sid = $('.layui-input').eq(0).val();
+            var company = $(".layui-input").eq(1).val();
+            table.reload('currentTableId',{
+                url:"/api/student_job/queryall.do",
+                method:"GET",
+                where:{
+                    sid:sid,
+                    company:company
+                }
+                ,page: {
+                    curr: 1 //重新从第 1 页开始
+                }
+            });
+            return false;
+        })
+
+        //搜索重置
+        form.on('submit(data-reset-btn)',function (){
+            tableFeresh('currentTableId',1)
+        })
+        //页面刷新
+        function tableFeresh(ele,currNum,param){
+            table.reload(ele,{
+                url:'/api/student_job/queryall.do'
+                ,page:{
+                    curr:currNum
+                },
+                where:{
+                    serachParam:param
+                }
+            },'data')
+        }
+
+        //    监听添加
+        table.on('toolbar(currentTableFilter)',function (obj){
+            //event 事件对象
+            if (obj.event === 'add'){
+                var index = layer.open({
+                    title:'就业新增',
+                    type:2,
+                    shade:0.2,
+                    maxmin:true,
+                    shadeClose:true,
+                    area:['100%','100%'],
+                    content:'addstudentjob.html '
+                })
+
+                $(window).on('resize',function (){
+                    layer.full(index);
+                })
+            }else if(obj.event == 'addbatch'){
+                var index = layer.open({
+                    title:'导入Excel',
+                    type:2,
+                    shade:0.2,
+                    maxmin:true,
+                    shadeClose:true,
+                    area:['100%','100%'],
+                    content:'uploadsutdentjob.html',
+                    end:function (){
+                        tableFeresh('currentTableId',1);
+                    }
+                })
+            }
+
+        });
+        function refreshTable(currentTableId, number) {
+        }
+        table.on('tool(currentTableFilter)',function (obj) {
+            var data = obj.data;
+            console.log(JSON.stringify(data));
+            localStorage.setItem("user", JSON.stringify(data));
+            //event 事件对象
+            if (obj.event === 'edit'){
+                var index = layer.open({
+                    title:'编辑用户',
+                    type:2,
+                    shade:0.2,
+                    maxmin:true,
+                    shadeClose:true,
+                    area:['100%','100%'],
+                    content:'studentjobdetail.html',
+
+                    end:function (){
+                        tableFeresh('currentTableId',1)
+                    }
+                })
+                return false;
+
+            }
+
+        });
+
+    });
+</script>
 
 </body>
 </html>

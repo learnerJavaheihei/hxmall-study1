@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>锋豫智慧平台</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="lib/layui-v2.6.3/css/layui.css" media="all">
+    <link rel="stylesheet" href="css/public.css" media="all">
+    <style>
+        .layui-form-item .layui-input-company {width: auto;padding-right: 10px;line-height: 38px;}
+    </style>
+</head>
+<body>
+<div class="layuimini-container">
+    <div class="layuimini-main">
+
+        <div class="layui-form layuimini-form" lay-filter="fmedit">
+            <div class="layui-form-item">
+                <div class="layui-input-block">
+                    <input type="hidden" name="id" id="id" lay-verify="required" lay-reqtext="id"  class="layui-input">
+                </div>
+                <div class="layui-input-block">
+                    <input type="hidden" name="sid" id="sid" lay-verify="required" lay-reqtext="sid"  class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label required">薪资:</label>
+                <div class="layui-input-block">
+                    <input type="text" name="salary" id="salary" lay-verify="required"  placeholder="请输入薪资"  class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">学历:</label>
+                <div class="layui-input-block">
+                    <input type="text" name="edu" id="edu" placeholder="请输入学历" class="layui-input" lay-verify="required">
+                </div>
+            </div>
+            <div class="layui-form-item layui-form-text">
+                <label class="layui-form-label">学校:</label>
+                <div class="layui-input-block">
+                    <input type="text" name="school" id="school" placeholder="请输入学校" class="layui-input" lay-verify="required">
+                </div>
+            </div>
+            <div class="layui-form-item layui-form-text">
+                <label class="layui-form-label">专业:</label>
+                <div class="layui-input-block">
+                    <input type="text" name="major" id="major" placeholder="请输入专业" class="layui-input" lay-verify="required">
+                </div>
+            </div>
+            <div class="layui-form-item layui-form-text">
+                <label class="layui-form-label">公司:</label>
+                <div class="layui-input-block">
+                    <input type="text" name="company" id="company" placeholder="请输入公司" class="layui-input" lay-verify="required">
+                </div>
+            </div>
+            <div class="layui-form-item layui-form-text">
+                <label class="layui-form-label">城市:</label>
+                <div class="layui-input-block">
+                    <input type="text" name="city" id="city" placeholder="请输入城市" class="layui-input" lay-verify="required">
+                </div>
+            </div>
+            <div class="layui-form-item layui-form-text">
+                <label class="layui-form-label">入职时间:</label>
+                <div class="layui-input-block">
+                    <input type="text" name="jobdate" id="jobdate" placeholder="请输入时间" class="layui-input" lay-verify="required">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-input-block">
+                    <button class="layui-btn layui-btn-normal" lay-submit lay-filter="saveBtn">确认保存</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="lib/layui-v2.6.3/layui.js" charset="utf-8"></script>
+<script src="js/lay-config.js?v=1.0.4" charset="utf-8"></script>
+<script>
+
+
+    var json = localStorage.getItem("user");
+    var user = JSON.parse(json);
+    layui.use(['form','miniTab','jquery'],function (){
+        var form=layui.form;
+        var miniTab = layui.miniTab,
+            layer = layui.layer,
+            $ = layui.jquery;
+        form.val("fmedit",user);
+        form.on('submit(saveBtn)',function (data){
+
+            var field = data.field;
+            var insertDay = JSON.stringify(field);
+            console.log(field);
+            console.log(insertDay);
+            $.ajax({
+                url:"/api/student_job/update.do",
+                type:"POST",
+                contentType:'application/json;charset=utf-8',
+                data:insertDay,
+                success:function (data){
+                    if (data.code==10000){
+                        layer.alert("修改成功");
+                        var frames = parent.layer.getFrameIndex(window.name);
+                        parent.layer.close(frames);
+                    }else {
+                        layer.alert("修改失败");
+                    }
+                }
+            })
+            return false;
+        })
+    })
+
+</script>
+</body>
+</html>

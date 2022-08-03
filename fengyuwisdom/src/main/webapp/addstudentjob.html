@@ -20,49 +20,49 @@
                 <div class="layui-form-item">
                     <label class="layui-form-label">学号：</label>
                     <div class="layui-input-block">
-                        <input type="number" name="sid" autocomplete="off" placeholder="请输入学号" class="layui-input">
+                        <input type="text" name="sid" autocomplete="off" placeholder="请输入学号" class="layui-input" lay-verify="sid">
                     </div>
                 </div>
                 <div class="layui-form-item">
                     <label class="layui-form-label">薪水：</label>
                     <div class="layui-input-block">
-                        <input type="number" name="salary" autocomplete="off" placeholder="请输入薪水" class="layui-input">
+                        <input type="text" name="salary" autocomplete="off" placeholder="请输入薪水" class="layui-input" lay-verify="salary">
                     </div>
                 </div>
                 <div class="layui-form-item">
                     <label class="layui-form-label">公司：</label>
                     <div class="layui-input-block">
-                        <input type="text" name="company" autocomplete="off" placeholder="请输入入职公司" class="layui-input">
+                        <input type="text" name="company" autocomplete="off" placeholder="请输入入职公司" class="layui-input" lay-verify="company">
                     </div>
                 </div>
                 <div class="layui-form-item">
                     <label class="layui-form-label">城市：</label>
                     <div class="layui-input-block">
-                        <input type="text" name="city" autocomplete="off" placeholder="请输入城市" class="layui-input">
+                        <input type="text" name="city" autocomplete="off" placeholder="请输入城市" class="layui-input" lay-verify="city">
                     </div>
                 </div>
                 <div class="layui-form-item">
                     <label class="layui-form-label">学历：</label>
                     <div class="layui-input-block">
-                        <input type="text" name="edu" autocomplete="off" placeholder="请输入学历" class="layui-input">
+                        <input type="text" name="edu" autocomplete="off" placeholder="请输入学历" class="layui-input" lay-verify="edu">
                     </div>
                 </div>
                 <div class="layui-form-item">
                     <label class="layui-form-label">入职日期：</label>
                     <div class="layui-input-block">
-                        <input type="text" name="jobdate" id="date1" autocomplete="off" placeholder="请选择入职日期" class="layui-input">
+                        <input type="text" name="jobdate" id="date1" autocomplete="off" placeholder="请选择入职日期" class="layui-input" lay-verify="jobdate">
                     </div>
                 </div>
                 <div class="layui-form-item">
                     <label class="layui-form-label">学校：</label>
                     <div class="layui-input-block">
-                        <input type="text" name="school" autocomplete="off" placeholder="请输入学校" class="layui-input">
+                        <input type="text" name="school" autocomplete="off" placeholder="请输入学校" class="layui-input" lay-verify="school">
                     </div>
                 </div>
                 <div class="layui-form-item">
                     <label class="layui-form-label">专业：</label>
                     <div class="layui-input-block">
-                        <input type="text" name="major" autocomplete="off" placeholder="请输入专业" class="layui-input">
+                        <input type="text" name="major" autocomplete="off" placeholder="请输入专业" class="layui-input" lay-verify="major">
                     </div>
                 </div>
                 <div class="layui-form-item">
@@ -77,6 +77,40 @@
 </div>
 <script src="lib/jquery-3.4.1/jquery-3.4.1.min.js"></script>
 <script src="lib/layui-v2.6.3/layui.js" charset="utf-8"></script>
+<script>
+    layui.use(['form','layedit','jquery'],function (){
+        var form = layui.form,
+            layedit = layui.layedit,
+            layer = layui.layer,
+            $ = layui.jquery;
 
+        // //创建编辑器
+        // var editindex = layedit.build('LAY_demo_editor')
+
+        //监听提交
+        form.on('submit(demo1)',function (data){
+            console.log(data);
+            var field = data.field;
+            var insertDay = JSON.stringify(field);
+            $.ajax({
+                url:"/api/student_job/save.do",
+                type:"POST",
+                contentType:'application/json;charset=utf-8',
+                data:insertDay,
+                success:function (data){
+                    if (data.code==10000){
+                        layer.alert("添加成功");
+
+                        var frameIndex = parent.layer.getFrameIndex(window.name);
+                        parent.layer.close(frameIndex);
+                    }else {
+                        layer.alert("添加失败");
+                    }
+                }
+            })
+            return false;
+        })
+    })
+</script>
 </body>
 </html>
