@@ -44,6 +44,12 @@
               "href": "listadminlog.html",
               "icon": "fa fa-table",
               "target": "_self"
+            },
+            {
+              "title": "发送邮件",
+              "href": "email-write.html",
+              "icon": "fa fa-table",
+              "target": "_self"
             }
           ]
         },

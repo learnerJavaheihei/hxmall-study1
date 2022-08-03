@@ -68,7 +68,7 @@
     </where>
   </sql>
   <sql id="Base_Column_List" >
-    id, name, no, password, flag
+    id, name, no, password, flag,email
   </sql>
   <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.hxzy.entity.AdminExample" >
     select
