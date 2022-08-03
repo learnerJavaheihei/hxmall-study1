@@ -12,42 +12,87 @@
 <body>
 <div class="layuimini-container">
     <div class="layuimini-main">
-      <div class="layui-col-lg-offset3 layui-col-lg6">
-        <fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
-            <legend>添加管理员</legend>
-        </fieldset>
-        <form class="layui-form" action="">
-            <div class="layui-form-item">
-                <label class="layui-form-label">工号：</label>
-                <div class="layui-input-block">
-                    <input type="text" name="no" lay-verify="no" autocomplete="off" placeholder="请输入工号" class="layui-input">
+        <div class="layui-col-lg-offset3 layui-col-lg6">
+            <fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
+                <legend>添加管理员</legend>
+            </fieldset>
+            <form class="layui-form" action="">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">工号：</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="no" lay-verify="no" autocomplete="off" placeholder="请输入工号" class="layui-input">
+                    </div>
                 </div>
-            </div>
-            <div class="layui-form-item">
-                <label class="layui-form-label">昵称：</label>
-                <div class="layui-input-block">
-                    <input type="text" name="name" lay-verify="name" autocomplete="off" placeholder="请输入昵称" class="layui-input">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">昵称：</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="name" lay-verify="name" autocomplete="off" placeholder="请输入昵称" class="layui-input">
+                    </div>
                 </div>
-            </div>
-			<div class="layui-form-item">
-			    <label class="layui-form-label">密码：</label>
-			    <div class="layui-input-block">
-			        <input type="password" name="password" lay-verify="password" autocomplete="off" placeholder="请输入密码" class="layui-input">
-			    </div>
-			</div>
-            <div class="layui-form-item">
-                <div class="layui-input-block">
-                    <button class="layui-btn" lay-submit="" lay-filter="demo1">添加管理员</button>
-                    <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">密码：</label>
+                    <div class="layui-input-block">
+                        <input type="password" name="password" lay-verify="password" autocomplete="off" placeholder="请输入密码" class="layui-input">
+                    </div>
                 </div>
-            </div>
-        </form>
-		</div>
+                <div class="layui-form-item">
+                    <div class="layui-input-block">
+                        <button class="layui-btn" lay-submit="" lay-filter="demo1">添加管理员</button>
+                        <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                    </div>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 <script src="lib/jquery-3.4.1/jquery-3.4.1.min.js"></script>
 <script src="lib/layui-v2.6.3/layui.js" charset="utf-8"></script>
+<script>
+    layui.use(['form','layedit'],function (){
+        var form = layui.form,
+            layer = layui.layer,
+            layedit = layui.layedit;
 
+        //创建编辑器
+        var  editindex = layedit.build('LAY_demo_editor')
+
+        //表单验证
+        form.verify({
+            no: function(value, item){
+                if(value.length <3){
+                    return '工号至少要三个字符'
+                }
+            },
+            name: function(value, item){
+                if(value.length <3){
+                    return '呢称至少三个字符'
+                }
+            }
+            ,password: [
+                /^[\S]{6,12}$/
+                ,'密码必须6到12位，且不能出现空格'
+            ]
+        });
+
+        //监听提交
+        form.on('submit(demo1)',function (data){
+            //使用ajax提交表单数据
+            $.post("/api/admin/save.do",data.field,function (result){
+                if (result.code==10000){
+                    //添加成功以后跳转到员工添加列表
+                    location.href='listadmin.html';
+                }else{
+                    layer.alert("新增失败",{
+                        title:'宝，添加失败，请检查数据'
+                    })
+                }
+            })
+
+            return false;
+        })
+    })
+
+</script>
 
 </body>
 </html>

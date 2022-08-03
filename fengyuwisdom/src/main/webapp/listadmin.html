@@ -21,29 +21,19 @@
                         <div class="layui-inline">
                             <label class="layui-form-label">用户姓名</label>
                             <div class="layui-input-inline">
-                                <input type="text" name="username" autocomplete="off" class="layui-input">
+                                <input type="text" name="name" autocomplete="off" class="layui-input">
                             </div>
                         </div>
                         <div class="layui-inline">
-                            <label class="layui-form-label">用户性别</label>
+                            <label class="layui-form-label">用户工号</label>
                             <div class="layui-input-inline">
-                                <input type="text" name="sex" autocomplete="off" class="layui-input">
+                                <input type="text" name="no" autocomplete="off" class="layui-input">
                             </div>
                         </div>
                         <div class="layui-inline">
-                            <label class="layui-form-label">用户城市</label>
-                            <div class="layui-input-inline">
-                                <input type="text" name="city" autocomplete="off" class="layui-input">
-                            </div>
-                        </div>
-                        <div class="layui-inline">
-                            <label class="layui-form-label">用户职业</label>
-                            <div class="layui-input-inline">
-                                <input type="text" name="classify" autocomplete="off" class="layui-input">
-                            </div>
-                        </div>
-                        <div class="layui-inline">
-                            <button type="submit" class="layui-btn layui-btn-primary"  lay-submit lay-filter="data-search-btn"><i class="layui-icon"></i> 搜 索</button>
+                            <button type="submit" class="layui-btn layui-btn-primary" lay-submit
+                                    lay-filter="data-search-btn"><i class="layui-icon" lay-event="sum"></i> 搜 索
+                            </button>
                         </div>
                     </div>
                 </form>
@@ -52,8 +42,8 @@
 
         <script type="text/html" id="toolbarDemo">
             <div class="layui-btn-container">
-                <button class="layui-btn layui-btn-normal layui-btn-sm data-add-btn" lay-event="add"> 添加 </button>
-                <button class="layui-btn layui-btn-sm layui-btn-danger data-delete-btn" lay-event="delete"> 删除 </button>
+                <button class="layui-btn layui-btn-normal layui-btn-sm data-add-btn" lay-event="add"> 添加</button>
+                <button class="layui-btn layui-btn-sm layui-btn-danger data-delete-btn" lay-event="delete"> 删除</button>
             </div>
         </script>
 
@@ -67,7 +57,173 @@
     </div>
 </div>
 <script src="lib/layui-v2.6.3/layui.js" charset="utf-8"></script>
+<script>
 
+    layui.use(['table', 'form'], function () {
+        var $ = layui.jquery,
+            form = layui.form,
+            table = layui.table;
+
+        //第一个实例
+        table.render({
+            elem: '#currentTableId'
+            , url: '/api/admin/all.do' //数据接口
+            , page: true //开启分页
+            , toolbar:"#toolbarDemo"
+            ,defaultToolbar: ['filter','exports','print',{
+                title:'提示',
+                layEvent:'LAYTABLE_TIPS',
+                icon:'layui-icon-tips'
+            }]
+            , cols: [[ //表头
+                {type: 'checkbox', width: 120}
+                ,{field: 'id', title: 'ID', width: 120, sort: true}
+                , {field: 'no', title: '工号', width: 120}
+                , {field: 'name', title: '昵称', width: 120}
+                /*1234545     123********545    */
+                , {
+                    field: 'password', title: '密码', width: 120, templet: function (data) {
+                        var p = data.password;
+                        return p.substr(0.3) + "*********" + p.substr(p.length - 3);
+                    }
+                }
+                , {
+                    field: 'flag', title: '状态', width: 120, templet: function (data) {
+                        if (data.flag == 1) {
+                            return '有效';
+                        } else {
+                            return '无效';
+                        }
+                    }
+                },
+                {title: '操作', minWidth: 150, toolbar: '#currentTableBar'}
+
+            ]],
+            limits: [10, 15, 20, 25, 50],
+            limit: 15,
+            skin: 'line'
+
+        });
+
+        //搜索
+        form.on('submit(data-search-btn)',function (){
+            var name = $('.layui-input').eq(0).val();
+            var no = $(".layui-input").eq(1).val();
+            table.reload('currentTableId',{
+                url:"/api/admin/queryall.do",
+                method:"GET",
+                where:{
+                    name:name,
+                    no:no
+                }
+                ,page: {
+                    curr: 1 //重新从第 1 页开始
+                }
+            });
+            return false;
+        })
+        //搜索重置
+        form.on('submit(data-reset-btn)',function (){
+            tableFeresh('currentTableId',1)
+        })
+        //页面刷新
+        function tableFeresh(ele,currNum,param){
+            table.reload(ele,{
+                url:'/api/admin/queryall.do'
+                ,page:{
+                    curr:currNum
+                },
+                where:{
+                    serachParam:param
+                }
+            },'data')
+        }
+
+        //    监听添加
+        table.on('toolbar(currentTableFilter)',function (obj){
+            var event = obj.event;
+            var checkStatus = table.checkStatus('currentTableId');
+            var data1 = checkStatus.data;
+            var trs = obj.tr;
+            var dayData = JSON.stringify(data1);
+            //event 事件对象
+            if (obj.event === 'add'){
+                var index = layer.open({
+                    title:'添加用户',
+                    type:2,
+                    shade:0.2,
+                    maxmin:true,
+                    shadeClose:true,
+                    area:['100%','100%'],
+                    content:'addadmin.html'
+                })
+
+                $(window).on('resize',function (){
+                    layer.full(index);
+                })
+            }else if (obj.event === 'delete'){
+                layer.confirm("确定都删除吗？",function (index){
+                    layer.close(index);
+                    $.ajax({
+                        url:"/api/admin/deleteall.do",
+                        type:"POST",
+                        contentType:'application/json;charset=utf-8',
+                        data:dayData,
+                        success:function (data){
+                            if(data.code==10000){
+                                layer.alert("删除成功！")
+                                tableFeresh('currentTableId',1);
+                            }else {
+                                layer.alert("删除失败！")
+                            }
+                        }
+                    })
+
+                });
+
+            }
+        });
+        function refreshTable(currentTableId, number) {
+        }
+        table.on('tool(currentTableFilter)',function (obj){
+            var data = obj.data;
+            console.log(JSON.stringify(data));
+            localStorage.setItem("user",JSON.stringify(data));
+
+            //event 事件对象
+            if (obj.event === 'edit'){
+                var index = layer.open({
+                    title:'编辑用户',
+                    type:2,
+                    shade:0.2,
+                    maxmin:true,
+                    shadeClose:true,
+                    area:['100%','100%'],
+                    content:'admindetail.html',
+
+                    end:function (){
+                        tableFeresh('currentTableId',1)
+                    }
+                })
+                return false;
+
+            }else if (obj.event === 'delete'){
+                layer.confirm('真的删除该行数据吗',function (index){
+                    $.ajax({
+                        url: "api/admin/delete.do",
+                        type:"POST",
+                        data:{"id":data.id},
+                        dataType:"json"
+                    })
+                    obj.del();
+                    //后端执行ajax执行删除
+                    //关闭弹出框
+                    layer.close(index);
+                })
+            }
+        })
+    });
+</script>
 
 </body>
 </html>
