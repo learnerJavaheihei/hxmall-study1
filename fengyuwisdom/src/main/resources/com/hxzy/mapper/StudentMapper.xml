@@ -1,0 +1,291 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hxzy.mapper.StudentMapper" >
+  <resultMap id="BaseResultMap" type="com.hxzy.entity.Student" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="no" property="no" jdbcType="VARCHAR" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="sex" property="sex" jdbcType="INTEGER" />
+    <result column="hometown" property="hometown" jdbcType="VARCHAR" />
+    <result column="education" property="education" jdbcType="VARCHAR" />
+    <result column="gid" property="gid" jdbcType="INTEGER" />
+    <result column="ctime" property="ctime" jdbcType="TIMESTAMP" />
+    <result property="gradeName" column="gradeName"/>
+
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    id, no, name, sex, hometown, education, gid, ctime
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.hxzy.entity.StudentExample" >
+    select
+    t_student.*,t_grade.name as gradeName
+    from t_student
+    left join t_grade
+    on t_grade.id=t_student.gid
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from t_student
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from t_student
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <delete id="deleteByExample" parameterType="java.lang.Integer" >
+    delete from t_student
+    where
+    <foreach collection="ids" item="id" separator="or">
+      t_student.id =#{id}
+    </foreach>
+  </delete>
+  <insert id="insert" parameterType="com.hxzy.entity.Student" >
+    insert into t_student (id, no, name, 
+      sex, hometown, education, 
+      gid, ctime)
+    values (#{id,jdbcType=INTEGER}, #{no,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, 
+      #{sex,jdbcType=INTEGER}, #{hometown,jdbcType=VARCHAR}, #{education,jdbcType=VARCHAR}, 
+      #{gid,jdbcType=INTEGER}, #{ctime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.hxzy.entity.Student" >
+    insert into t_student
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="no != null" >
+        no,
+      </if>
+      <if test="name != null" >
+        name,
+      </if>
+      <if test="sex != null" >
+        sex,
+      </if>
+      <if test="hometown != null" >
+        hometown,
+      </if>
+      <if test="education != null" >
+        education,
+      </if>
+      <if test="gid != null" >
+        gid,
+      </if>
+      <if test="ctime != null" >
+        ctime,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="no != null" >
+        #{no,jdbcType=VARCHAR},
+      </if>
+      <if test="name != null" >
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="sex != null" >
+        #{sex,jdbcType=INTEGER},
+      </if>
+      <if test="hometown != null" >
+        #{hometown,jdbcType=VARCHAR},
+      </if>
+      <if test="education != null" >
+        #{education,jdbcType=VARCHAR},
+      </if>
+      <if test="gid != null" >
+        #{gid,jdbcType=INTEGER},
+      </if>
+      <if test="ctime != null" >
+        #{ctime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.hxzy.entity.StudentExample" resultType="java.lang.Integer" >
+    select count(*) from t_student
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update t_student
+    <set >
+      <if test="record.id != null" >
+        id = #{record.id,jdbcType=INTEGER},
+      </if>
+      <if test="record.no != null" >
+        no = #{record.no,jdbcType=VARCHAR},
+      </if>
+      <if test="record.name != null" >
+        name = #{record.name,jdbcType=VARCHAR},
+      </if>
+      <if test="record.sex != null" >
+        sex = #{record.sex,jdbcType=INTEGER},
+      </if>
+      <if test="record.hometown != null" >
+        hometown = #{record.hometown,jdbcType=VARCHAR},
+      </if>
+      <if test="record.education != null" >
+        education = #{record.education,jdbcType=VARCHAR},
+      </if>
+      <if test="record.gid != null" >
+        gid = #{record.gid,jdbcType=INTEGER},
+      </if>
+      <if test="record.ctime != null" >
+        ctime = #{record.ctime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update t_student
+    set id = #{record.id,jdbcType=INTEGER},
+      no = #{record.no,jdbcType=VARCHAR},
+      name = #{record.name,jdbcType=VARCHAR},
+      sex = #{record.sex,jdbcType=INTEGER},
+      hometown = #{record.hometown,jdbcType=VARCHAR},
+      education = #{record.education,jdbcType=VARCHAR},
+      gid = #{record.gid,jdbcType=INTEGER},
+      ctime = #{record.ctime,jdbcType=TIMESTAMP}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.hxzy.entity.Student">
+    update t_student
+    <set>
+      <if test="no != null" >
+        no = #{no,jdbcType=VARCHAR},
+      </if>
+      <if test="name != null" >
+        name = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="sex != null" >
+        sex = #{sex,jdbcType=INTEGER},
+      </if>
+      <if test="hometown != null" >
+        hometown = #{hometown,jdbcType=VARCHAR},
+      </if>
+      <if test="education != null" >
+        education = #{education,jdbcType=VARCHAR},
+      </if>
+      <if test="gid != null" >
+        gid = #{gid,jdbcType=INTEGER},
+      </if>
+      <if test="ctime != null" >
+        ctime = #{ctime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.hxzy.entity.Student">
+    update t_student
+    set no = #{no,jdbcType=VARCHAR},
+      name = #{name,jdbcType=VARCHAR},
+      sex = #{sex,jdbcType=INTEGER},
+      hometown = #{hometown,jdbcType=VARCHAR},
+      education = #{education,jdbcType=VARCHAR},
+      gid = #{gid,jdbcType=INTEGER},
+      ctime = #{ctime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <insert id="saveBatch">
+    insert into t_student(id,`name`,sex ,hometown)
+    values
+    <foreach collection="list" item="item" separator=",">
+      (#{item.id},#{item.name},#{item.sex},#{item.hometown})
+    </foreach>
+  </insert>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select
+    t_student.*,t_grade.name as gradeName
+    from t_student
+    left join t_grade
+    on t_grade.id=t_student.gid
+<where>
+  <if test="name!=null">
+    and t_student.name like '%${name}%'
+  </if>
+<if test="hometown!=null">
+  and t_student.hometown like '%${hometown}%'
+</if>
+<if test="no!=null">
+  and t_student.no like '%${no}%'
+</if>
+<if test="sex!=0">
+  and t_student.sex like '%${sex}%'
+</if>
+<if test="education!=null">
+  and t_student.education like '%${education}%'
+</if>
+<if test="gradeName!=null">
+  and t_student.name like '%${gradeName}%'
+</if>
+</where>
+  </select>
+</mapper>

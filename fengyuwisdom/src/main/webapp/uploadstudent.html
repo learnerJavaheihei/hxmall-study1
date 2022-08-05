@@ -29,7 +29,27 @@
 </div>
 <script src="lib/jquery-3.4.1/jquery-3.4.1.min.js"></script>
 <script src="lib/layui-v2.6.3/layui.js" charset="utf-8"></script>
+<script>
+    layui.use('upload',function (){
+        var upload = layui.upload;
+        //执行实例
+        upload.render({
+            elem:'#btnup'
+            ,url:'/api/student/upload.do'
+            ,accept:"file"
+            ,done:function (res){
+                if (res.code=10000){
+                    layer.alert("上传成功",{
+                        title:"上传提示"
+                    })
+                }
+            }
+            ,error:function (){
 
+            }
+        });
+    });
+</script>
 
 </body>
 </html>

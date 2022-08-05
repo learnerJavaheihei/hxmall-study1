@@ -12,62 +12,246 @@
 <body>
 <div class="layuimini-container">
     <div class="layuimini-main">
-
         <fieldset class="table-search-fieldset">
             <legend>搜索信息</legend>
             <div style="margin: 10px 10px 10px 10px">
                 <form class="layui-form layui-form-pane" action="">
                     <div class="layui-form-item">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">学号：</label>
+                            <div class="layui-input-block">
+                                <input type="text" name="no" lay-verify="no" autocomplete="off" placeholder="请输入学号"
+                                       class="layui-input" id="no">
+                            </div>
+                        </div>
                         <div class="layui-inline">
                             <label class="layui-form-label">用户姓名</label>
                             <div class="layui-input-inline">
-                                <input type="text" name="username" autocomplete="off" class="layui-input">
+                                <input type="text" name="name" autocomplete="off" class="layui-input" id="name">
                             </div>
                         </div>
                         <div class="layui-inline">
                             <label class="layui-form-label">用户性别</label>
                             <div class="layui-input-inline">
-                                <input type="text" name="sex" autocomplete="off" class="layui-input">
+                                <input type="text" name="sex" autocomplete="off" class="layui-input" id="sex">
                             </div>
                         </div>
                         <div class="layui-inline">
-                            <label class="layui-form-label">用户城市</label>
+                            <label class="layui-form-label">家乡</label>
                             <div class="layui-input-inline">
-                                <input type="text" name="city" autocomplete="off" class="layui-input">
+                                <input type="text" name="hometown" autocomplete="off" class="layui-input" id="hometown">
                             </div>
                         </div>
                         <div class="layui-inline">
-                            <label class="layui-form-label">用户职业</label>
+                            <label class="layui-form-label">学历</label>
                             <div class="layui-input-inline">
-                                <input type="text" name="classify" autocomplete="off" class="layui-input">
+                                <input type="text" name="education" autocomplete="off" class="layui-input" id="education">
                             </div>
                         </div>
                         <div class="layui-inline">
-                            <button type="submit" class="layui-btn layui-btn-primary"  lay-submit lay-filter="data-search-btn"><i class="layui-icon"></i> 搜 索</button>
+                            <label class="layui-form-label">班级</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="gradeName" autocomplete="off" class="layui-input" id="gradeName">
+                            </div>
+
+                        </div>
+                        <div class="layui-inline">
+                            <button type="submit" class="layui-btn layui-btn-primary" lay-submit
+                                    lay-filter="data-search-btn" id="search-btn"><i class="layui-icon"></i> 搜 索
+                            </button>
                         </div>
                     </div>
                 </form>
             </div>
         </fieldset>
-
         <script type="text/html" id="toolbarDemo">
             <div class="layui-btn-container">
-                <button class="layui-btn layui-btn-normal layui-btn-sm data-add-btn" lay-event="add"> 添加 </button>
-                <button class="layui-btn layui-btn-sm layui-btn-danger data-delete-btn" lay-event="delete"> 删除 </button>
+                <button class="layui-btn layui-btn-normal layui-btn-sm data-add-btn" lay-event="add"> 添加
+                </button>
+                <button class="layui-btn layui-btn-sm layui-btn-danger data-delete-btn" lay-event="delete"> 删除
+                </button>
+                <button class="layui-btn layui-btn-normal layui-btn-sm data-add-btn" lay-event="export"> 下载
+                </button>
             </div>
         </script>
-
         <table class="layui-hide" id="currentTableId" lay-filter="currentTableFilter"></table>
 
         <script type="text/html" id="currentTableBar">
             <a class="layui-btn layui-btn-normal layui-btn-xs data-count-edit" lay-event="edit">编辑</a>
             <a class="layui-btn layui-btn-xs layui-btn-danger data-count-delete" lay-event="delete">删除</a>
         </script>
-
     </div>
 </div>
 <script src="lib/layui-v2.6.3/layui.js" charset="utf-8"></script>
+<script>
+    layui.use(['table', 'form', 'layer'], function () {
+        var $ = layui.jquery,
+            form = layui.form,
+            table = layui.table;
+        layer = layui.layer;
+
+        table.render({
+            elem: '#currentTableId'
+            , url: '/api/student/all.do'
+            , page: true
+            , toolbar: "#toolbarDemo"
+            , defaultToolbar: ['filter', 'exports', 'print', {
+                title: '提示',
+                layEvent: 'LAYTABLE_TIPS',
+                icon: 'layui-icon-tips'
+            }]
+            , cols: [[
+                {type: 'checkbox', width: 120}
+                , {field: 'id', title: 'ID', width: 120, sort: true}
+                , {field: 'no', title: '学号', width: 120}
+                , {field: 'name', title: '名字', width: 120}
+                , {
+                    field: 'sex', title: '性别', width: 120, templet: function (data) {
+                        if (data.sex == 2) {
+                            return '女';
+                        } else {
+                            return '男';
+                        }
+                    }
+                }
+                , {field: 'hometown', title: '家乡', width: 120}
+                , {field: 'education', title: '学历', width: 120}
+                , {field: 'gradeName', title: '班级', width: 120}
+                , {field: 'ctime', title: '创建时间', width: 120}
+                , {title: '操作', minWidth: 150, toolbar: '#currentTableBar'}
+            ]],
+            limits: [10, 15, 20, 25, 50],
+            limit: 10,
+            skin: 'line'
+        });
+        //监听
+        form.on('submit(data-search-btn)', function (data) {
+            //layui搜索
+            table.reload('currentTableId', {
+                url: "/api/student/select.do",
+                method: "GET",
+                where: {
+                    no: $("#no").val(),
+                    name: $("#name").val(),
+                    sex: $("#sex").val(),
+                    hometown: $("#hometown").val(),
+                    education: $("#education").val(),
+                    gradeName: $("#gradeName").val(),
+                },
+                page: {
+                    curr: 1
+                }
+            });
+            return false;
+        })
+
+        table.on('toolbar(currentTableFilter)', function (obj) {
+            switch (obj.event) {
+                // case 'add':
+                //     insertAll()
+                //     break;
+                case 'delete':
+                    deleteAll()
+                    break;
+                case 'update':
+                    layer.msg('编辑');
+                    break;
+            }
+            ;
+            // function insertAll(){
+            //     var index = layer.open({
+            //         title:'添加用户',
+            //         type:2,
+            //         shade:0.2,
+            //         maxmin:true,
+            //         shadeClose:true,
+            //         area:['100%','100%'],
+            //         content:'addstudent.html'
+            //
+            //     })
+            //     $(window).on('resize',function (){
+            //         layer.full(index);
+            //     })
+            // }
+
+            function deleteAll() {
+                var checkStauts = table.checkStatus('currentTableId'),
+                    data = checkStauts.data;
+                if (data.length > 0) {
+                    var idArr = [];
+                    for (let i = 0; i < data.length; i++) {
+                        idArr.push(data[i].id);
+                    }
+                    var ids = idArr.join("-")
+                    layer.confirm('确定删除选中的' + data.length + '个用户吗?', {icon: 3, title: '提示信息'}, function (index) {
+                        $.ajax({
+                            url: "/api/student/deleteAll.do/" + ids,
+                            type: "POST",
+                            dataType: "json",
+                            success: function (result) {
+                                if (result.code == 10000) {
+                                    layer.msg('删除成功')
+                                    tableFresh('currentTableId', 1)
+                                } else {
+                                    layer.msg("删除失败", function () {
+                                        time:2000
+                                    });
+                                }
+                            }
+                        })
+                    })
+                } else {
+                    layer.msg("选择需要删除的学生");
+                }
+            }
+        });
+
+        function tableFresh(ele, num) {
+            table.reload(ele, {
+                page: {
+                    curr: num
+                },
+                where: {}
+            }, 'data')
+        }
 
 
+        table.on('tool(currentTableFilter)', function (obj) {
+            var data = obj.data;
+            localStorage.setItem("user", JSON.stringify(data));
+            if (obj.event === 'edit') {
+                var index = layer.open({
+                    title: '编辑用户',
+                    type: 2,
+                    shade: 0.2,
+                    maxmin: true,
+                    shadeClose: true,
+                    area: ['100%', '100%'],
+                    content: 'editstudent.html',
+                    end: function () {
+                        tableFresh('currentTableId', 1);
+                    }
+                })
+                $(window).on('resize', function () {
+                    layer.full(index);
+                })
+                return false;
+            } else if (obj.event === 'delete') {
+                layer.confirm('真的删除该行数据吗', function (index) {
+                    $.ajax({
+                        url: "api/student/delete.do",
+                        type: "POST",
+                        data: {"id": data.id},
+                        dataType: "json",
+                    })
+                    obj.del();
+                    layer.close(index);
+                })
+            }
+
+
+        })
+    });
+</script>
 </body>
 </html>
