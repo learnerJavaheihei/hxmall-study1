@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>锋豫智慧平台</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="lib/layui-v2.6.3/css/layui.css" media="all">
+    <link rel="stylesheet" href="css/public.css" media="all">
+    <style>
+        .layui-form-item .layui-input-company {width: auto;padding-right: 10px;line-height: 38px;}
+    </style>
+</head>
+<body>
+<div class="layuimini-container">
+    <div class="layuimini-main">
+
+        <div class="layui-form layuimini-form" lay-filter="fmedit">
+            <div class="layui-form-item">
+                <div class="layui-input-block">
+                    <input type="hidden" name="id" lay-verify="id" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">学号：</label>
+                <div class="layui-input-block">
+                    <input type="text" name="no" lay-verify="no" autocomplete="off" placeholder="请输入工号" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">姓名：</label>
+                <div class="layui-input-block">
+                    <input type="text" name="name" lay-verify="name" autocomplete="off" placeholder="请输入昵称" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">性别：</label>
+                <div class="layui-input-block">
+                    <input type="radio" name="sex" value="1" title="男" checked="">
+                    <input type="radio" name="sex" value="2" title="女">
+                    <input type="radio" name="sex" value="3" title="第三性别">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">家乡：</label>
+                <div class="layui-input-block">
+                    <input type="text" name="hometown" lay-verify="hometown" autocomplete="off" placeholder="请输入家乡" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">学历：</label>
+                <div class="layui-input-block">
+                    <select name="education" >
+                        <option value="博士">博士</option>
+                        <option value="硕士">硕士</option>
+                        <option value="学士" >本科</option>
+                        <option value="专科">专科</option>
+                        <option value="高中">高中</option>
+                        <option value="初中及以下">初中及以下</option>
+                    </select>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">班级</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="gid" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <!--                <div class="layui-form-item">-->
+            <!--                    <label class="layui-form-label">班级：</label>-->
+            <!--                    <div class="layui-input-block">-->
+            <!--                        <select name="gid" >-->
+            <!--                            <option value="1">Java-210</option>-->
+            <!--                            <option value="2">Java-211</option>-->
+            <!--                            <option value="3" >Java-212</option>-->
+            <!--                            <option value="4">Java-213</option>-->
+            <!--                            <option value="5">Java-214</option>-->
+            <!--                            <option value="6">Java-215</option>-->
+            <!--                        </select>-->
+            <!--                    </div>-->
+            <!--                </div>-->
+            <!--            <div class="layui-inline">-->
+            <!--                <label class="layui-form-label">创建日期</label>-->
+            <!--                <div class="layui-input-inline">-->
+            <!--                    <input type="text" name="ctime" id="ctime" lay-verify="required" placeholder="yyyy-MM-dd"-->
+            <!--                           autocomplete="off" class="layui-input">-->
+            <!--                </div>-->
+            <!--            </div>-->
+            <div class="layui-form-item">
+                <div class="layui-input-block">
+                    <button class="layui-btn layui-btn-normal" lay-submit="" lay-filter="saveBtn">确认保存</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="lib/layui-v2.6.3/layui.js" charset="utf-8"></script>
+<script src="js/lay-config.js?v=1.0.4" charset="utf-8"></script>
+<script>
+    //获取本地磁盘的存的数据
+    var json = localStorage.getItem("user");
+    var user = JSON.parse(json);
+    var $ = layui.jquery;
+
+    console.log(user)
+    layui.use(['form','miniTab','laydate'],function (){
+        var form = layui.form,
+            miniTab = layui.miniTab,
+            layer = layui.layer;
+        form.val("fmedit",user)
+        var laydate = layui.laydate;
+        laydate.render({
+            elem: '#ctime'
+        });
+        form.verify({
+            name:function (value,item){
+                if (!new RegExp("^[a-zA-Z0-9_\u4e00-\u9fa5\\s·]+$").test(value)){
+                    return '姓名不能有特殊字符及用户名不为空';
+                }
+                if (/(^\_)|(\__)|(\_+$)/.test(value)){
+                    return '姓名首尾不能出现\'_\'';
+                }
+                if (/^\d+\d+\d$/.test(value)){
+                    return '姓名不能为数字';
+                }
+            }
+            ,address:[
+                /^[\S]{1,12}$/
+                ,'地区必须1到12位，且不能出现空格'
+            ]
+        });
+
+        form.on('submit(saveBtn)',function (data){
+            $.post("/api/student/update.do",data.field,function (res){
+                if (res.code == 10000){
+                    // let frameIndex = parent.layer.getFrameIndex(window.name);
+                    // parent.layer.close(frameIndex);
+                    location.href="liststudent.html";
+                }else {
+                    layer.alert('修改失败',{
+                        title:"修改失败"
+                    })
+                }
+            })
+            return false;
+        })
+    })
+</script>
+</body>
+</html>

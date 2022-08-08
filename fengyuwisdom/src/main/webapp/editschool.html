@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title><!DOCTYPE html>
+      <html>
+      <head>
+      <meta charset="utf-8">
+      <title>锋豫智慧平台</title>
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <link rel="stylesheet" href="lib/layui-v2.6.3/css/layui.css" media="all">
+  <link rel="stylesheet" href="css/public.css" media="all">
+  <style>
+    .layui-form-item .layui-input-company {width: auto;padding-right: 10px;line-height: 38px;}
+  </style>
+</head>
+<body>
+<div class="layuimini-container">
+  <div class="layuimini-main">
+
+    <div class="layui-form layuimini-form" lay-filter="fmedit">
+      <div class="layui-form-item">
+        <div class="layui-input-block">
+          <input type="hidden" name="id" lay-verify="id" autocomplete="off" class="layui-input">
+        </div>
+      </div>
+      <div class="layui-form-item">
+        <label class="layui-form-label">学校编号：</label>
+        <div class="layui-input-block">
+          <input type="text" name="no" id="no" lay-verify="no" autocomplete="off" placeholder="请输入编号" class="layui-input">
+        </div>
+      </div>
+      <div class="layui-form-item">
+        <label class="layui-form-label">学校：</label>
+        <div class="layui-input-block">
+          <input type="text" name="name" id="name" lay-verify="name" autocomplete="off" placeholder="请输入学校名称" class="layui-input">
+        </div>
+      </div>
+      <div class="layui-form-item">
+        <label class="layui-form-label">地址</label>
+        <div class="layui-input-block">
+          <input type="text" name="address" id="address" lay-verify="address" autocomplete="off" placeholder="请输入地址" class="layui-input">
+        </div>
+      </div>
+      <!--      <div class="layui-inline">-->
+      <!--        <label class="layui-form-label">创建日期</label>-->
+      <!--        <div class="layui-input-inline">-->
+      <!--          <input type="text" name="ctime" id="ctime" lay-verify="required" placeholder="yyyy-MM-dd"-->
+      <!--                 autocomplete="off" class="layui-input">-->
+      <!--        </div>-->
+      <!--      </div>-->
+      <div class="layui-form-item">
+        <div class="layui-input-block">
+          <button class="layui-btn layui-btn-normal" lay-submit="" lay-filter="saveBtn">确认保存</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="lib/layui-v2.6.3/layui.js" charset="utf-8"></script>
+<script src="js/lay-config.js?v=1.0.4" charset="utf-8"></script>
+<script>
+  //获取本地磁盘的存的数据
+  var json = localStorage.getItem("user");
+  var user = JSON.parse(json);
+  console.log(user)
+  layui.use(['form','miniTab','laydate','jquery','dropdown'],function (){
+    var form = layui.form,
+            miniTab = layui.miniTab,
+            layer = layui.layer,
+            $=layui.jquery,
+            dropdown=layui.dropdown,
+            laydate = layui.laydate;
+    laydate.render({
+      elem:'#ctime'
+    });
+    laydate.render({
+      elem: '#ctime'
+    });
+    form.verify({
+      name:function (value,item){
+        if (!new RegExp("^[a-zA-Z0-9_\u4e00-\u9fa5\\s·]+$").test(value)){
+          return '学校名称不能有特殊字符及用户名不为空';
+        }
+        if (/(^\_)|(\__)|(\_+$)/.test(value)){
+          return '名称首尾不能出现\'_\'';
+        }
+        if (/^\d+\d+\d$/.test(value)){
+          return '名称不能为数字';
+        }
+      }
+      ,address:[
+        /^[\S]{1,12}$/
+        ,'地区必须1到12位，且不能出现空格'
+      ]
+    });
+    form.val("fmedit",user);
+    form.on('submit(saveBtn)',function (data){
+      $.post("/api/school/update.do",data.field,function (res){
+        if (res.code == 10000){
+          let frameIndex = parent.layer.getFrameIndex(window.name);
+          parent.layer.close(frameIndex);
+        }else {
+          layer.alert('修改失败',{
+            title:"修改失败"
+          })
+        }
+      })
+      return false;
+    })
+  })
+</script>
+</body>
+</html>
+</title>
+</head>
+<body>
+
+</body>
+</html>
