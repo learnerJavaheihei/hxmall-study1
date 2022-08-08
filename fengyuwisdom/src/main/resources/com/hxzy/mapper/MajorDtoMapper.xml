@@ -200,4 +200,7 @@
   </if>
 </where>
   </select>
+  <select id="stuSexTj"  resultType="com.hxzy.entity.MajorSexDto">
+    select sname, count(*) ct from t_major  group by sname
+  </select>
 </mapper>

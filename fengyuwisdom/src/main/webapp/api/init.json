@@ -89,7 +89,39 @@
               "href": "listgrade.html",
               "icon": "fa fa-table",
               "target": "_self"
-            }]
+            },            {
+              "title": "邮件发送",
+              "href": "Ykemail-write.html",
+              "icon": "fa fa-table",
+              "target": "_self"
+            }
+          ]
+        },
+        {
+          "title": "专业列表",
+          "href": "",
+          "icon": "fa fa-file-text",
+          "target": "_self",
+          "child": [
+            {
+              "title": "专业新增",
+              "href": "addmajor.html",
+              "icon": "fa fa-plus-square",
+              "target": "_self"
+            },
+            {
+              "title": "专页列表",
+              "href": "listmajor.html",
+              "icon": "fa fa-table",
+              "target": "_self"
+            },
+            {
+              "title": "专页统计",
+              "href": "tjmajor.html",
+              "icon": "fa fa-table",
+              "target": "_self"
+            }
+          ]
         },
         {
           "title": "学生管理",

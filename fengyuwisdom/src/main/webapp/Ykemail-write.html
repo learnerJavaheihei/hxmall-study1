@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html class="iframe-h">
+<head>
+    <meta charset="UTF-8">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no"/>
+    <title>网站后台</title>
+    <link rel="stylesheet" type="text/css" href="lib/layui-v2.6.3/css/layui.css"/>
+    <link rel="stylesheet" type="text/css" href="css/admin.css"/>
+</head>
+<body class="iframe-h">
+<div class="layui-row" id="popSearchRoleTest" style="display: none">
+    <script type="text/html" id="toolbarDemo">
+        <div class="layui-btn-container">
+            <button class="layui-btn layui-btn-normal layui-btn-sm data-add-btn" lay-event="add"> 添加</button>
+        </div>
+    </script>
+    <div class="layui-col-md11">
+        <table class="layui-hide" id="currentTableId" lay-filter="currentTableFilter"></table>
+    </div>
+</div>
+<div class="email-write">
+    <form class="layui-form">
+
+
+        <div class="layui-form-item">
+            <input type="text" name="email" id="emails" lay-verify="name" autocomplete="off" placeholder="请输入收件人"
+                   class="layui-input ">
+            <button type="button" id="choose" class="layui-btn layui-btn-sm layui-btn-normal">选择联系人</button>
+        </div>
+        <div class="layui-form-item">
+            <input type="text" name="title" lay-verify="title" autocomplete="off" placeholder="请输入主题"
+                   class="layui-input">
+        </div>
+        <div class="layui-form-item">
+            <input type="text" id="filepath" name="filepath"  autocomplete="off"  class="layui-input layui-hide">
+        </div>
+        <div class="layui-form-item layui-form-text">
+            <textarea class="layui-textarea layui-hide" name="content"  lay-verify="content"
+                      id="content"></textarea>
+        </div>
+        <div class="layui-form-item">
+            <button class="layui-btn layui-btn-normal" lay-submit=""  lay-filter="demo1"><i
+                    class="layui-icon">&#xe609;</i> 立即发送
+            </button>
+        </div>
+
+    </form>
+</div>
+</body>
+</html>
+<script src="lib/jquery-3.4.1/jquery-3.4.1.min.js"></script>
+<script src="lib/layui-v2.6.3/layui.js" type="text/javascript" charset="utf-8"></script>
+<!--加载富文本编辑框-->
+<script>
+    layui.extend({
+        //给的需要加载的模块地址
+        tinymce:'{/}./js/lay-module/tinymce/tinymce'
+    }).use(['form','table','tinymce'],function (){
+        var form = layui.form,
+            table = layui.table,
+            tinymce = layui.tinymce,
+            layer=layui.layer;
+        $("#choose").click(function (){
+            //初始化数据表格
+            loadDataGrid(table);
+        })
+
+        //初始化文本框
+        tinymceInit("#content",'/upload/singleFile.do','#filepath',tinymce);
+        //监听提交
+        form.on('submit(demo1)',function (data){
+            //获取编辑器文本的值
+            var editV = tinymce.get('#content').getContent({format:'text'})
+            data.field.content = editV
+            //使用ajax提交表单数据
+            $.post("/send/sendMail.do",data.field,function (result){
+                if (result.code==10000){
+                    layer.msg("邮件发送成功",{time:4000})
+                    $("#form_info").reset();
+                }else{
+                    layer.msg("邮件发送失败")
+                }
+            })
+            return false;
+        })
+
+    })
+    //查询的
+    function  loadDataGrid(table){
+        table.render({
+            elem: '#currentTableId'
+            , url: '/api/class/all.do' //数据接口
+            , page: true //开启分页
+            , toolbar:"#toolbarDemo"
+            ,defaultToolbar: []
+            , cols: [[ //表头
+                {type: 'checkbox', width: 120}
+                , {field: 'email', title: '邮箱', width: 120}
+                , {field: 'name', title: '昵称', width: 120}
+            ]],
+            limits: [10, 15, 20, 25, 50],
+            limit: 15,
+            skin: 'line'
+
+        });
+        //添加的
+        table.on('toolbar(currentTableFilter)',function (obj){
+            //event 事件对象
+            if (obj.event === 'add'){
+                var checkStauts =  table.checkStatus('currentTableId')
+                    ,data = checkStauts.data;
+
+                //将选中的状态
+                var dataArr = [];
+                data.forEach(function (item,index){
+                    dataArr[index] = item.email;
+                })
+                if(dataArr.length >0){
+                    setEmail("#emails",dataArr)
+                }else {
+                    layer.msg("笨蛋请选择")
+                    setEmail("#emails",dataArr)
+                }
+                //关闭弹出框
+                layer.close(index);
+                //将获取的值显示到收件人输入框
+
+            }
+        });
+
+        //打开弹出框
+        var index = layer.open({
+            type: 1,
+            title:'选择联系人',
+            area:['50%','50%'],
+            content:$("#popSearchRoleTest"),
+            end:function (){
+                layer.close(index);
+                $("#popSearchRoleTest").css({'display':'none'})
+                return false;
+            }
+        })
+    }
+
+
+    //回显数据回显到收件人输入框
+    function  setEmail(ele,value) {
+        $(ele).val('')
+        if (value.length != 0) {
+            $(ele).val(value)
+        }
+    }
+    //初始化富文本框 上传文件
+    function tinymceInit(ele,url,filepath,tinymce){
+        var  edit  =tinymce.render({
+            elem: ele
+            , height:600
+            ,width:'100%'
+            ,images_upload_handler:function(blobInfo, succFun, failFun){
+                //使用Xhr模拟表单发送文件数据
+                var xhr, formData;
+                var file = blobInfo.blob();//转化为易于理解的file对象
+                xhr = new XMLHttpRequest();
+                xhr.withCredentials = false;
+                //模拟request发送请求
+                xhr.open('POST', url);
+                //请求执行完成以后执行的函数
+                xhr.onload = function() {
+                    var json;
+                    if (xhr.status != 200) {
+                        failFun('HTTP Error: ' + xhr.status);
+                        return;
+                    }
+                    //responseText  response响应的对象 xhr.responseText 获取响应数据
+                    json = JSON.parse(xhr.responseText);
+                    if (!json || typeof json.data != 'string') {
+                        failFun('Invalid JSON: ' + xhr.responseText);
+                        return;
+                    }
+                    if (json.code==10000){
+                        edit.setContent('')
+                        //将获取的文件路径放置在隐藏域中
+                        $(filepath).val(json.data)
+                        layer.msg('上传成功')
+
+
+                    }
+                };
+                //表单数据
+                formData = new FormData();
+                //第一个参数是发送数据的格式，第二个参数是数据对象，发送名称
+                formData.append('file', file, file.name );//此处与源文档不一样
+                xhr.send(formData);
+            }
+            ,bdmap_options: {
+                width: 560,
+                height: 360,
+                outputIframe: 'https://unpkg.com/@npkg/tinymce-plugins',
+                apiKey: 'ONXXXXXXXXXXXXXXnP'
+            }
+        });
+
+
+    }
+</script>
+
+
+
+

@@ -3,6 +3,7 @@ package com.hxzy.mapper;
 
 import com.hxzy.entity.MajorDto;
 import com.hxzy.entity.MajorDtoExample;
+import com.hxzy.entity.MajorSexDto;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -25,4 +26,5 @@ public interface MajorDtoMapper {
     int deleteByPrimaryKey(Integer uuid);
     //
     List<MajorDto> selectData(@Param("sname") String sname ,@Param("major") String major);
+    List<MajorSexDto> stuSexTj();
 }

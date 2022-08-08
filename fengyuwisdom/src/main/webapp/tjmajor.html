@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>锋豫智慧平台</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="lib/layui-v2.6.3/css/layui.css" media="all">
+    <link rel="stylesheet" href="css/public.css" media="all">
+    <!-- 1.引入js库 -->
+    <script src="lib/jquery-3.4.1/jquery-3.4.1.min.js"></script>
+    <script src="lib/layui-v2.6.3/layui.js" charset="utf-8"></script>
+    <script type="text/javascript" src="https://fastly.jsdelivr.net/npm/echarts@5.3.3/dist/echarts.min.js"></script>
+</head>
+<body>
+<div class="layuimini-container">
+    <div class="layuimini-main">
+        <div class="layui-col-lg-offset1 layui-col-lg5" id="dvsex" style="height: 500px;">
+        </div>
+        <div class="layui-col-lg-offset1 layui-col-lg5" id="dvgrade" style="height: 500px;">
+        </div>
+    </div>
+</div>
+
+</body>
+
+<script type="text/javascript">
+    layui.use(['layer'], function () {
+        var $ = layui.layer;
+        getDataChart();
+    })
+
+    function  getDataChart(){
+        //发送ajax请求后端数据
+        $.get("/api/majo/stuTJ.do",function (res){
+            var seriesData = [];
+            var  legendData =[];
+            if (res.code==10000){
+                legendData = res.data.sexs;
+                seriesData = res.data.values;
+            }
+
+            getCharts(seriesData,legendData);
+        })
+    }
+
+    function  getCharts(seriesData,legendData){
+        var dom = document.getElementById('dvsex');
+        var myChart = echarts.init(dom, null, {
+            renderer: 'canvas',
+            useDirtyRect: false
+        });
+
+        var option;
+
+        option = {
+            title: {
+                text: '姓名统计',
+                left: 'center'
+            },
+            tooltip: {
+                trigger: 'item'
+            },
+            legend: {
+                orient: 'vertical',
+                left: 'left',
+                data:legendData//动态获取数据
+            },
+            series: [
+                {
+                    name: 'Access From',
+                    type: 'pie',
+                    radius: '50%',
+                    //动态获取
+                    //List<Map<String,Object>>   getStuTj();   List<?>  = select sex,count(*) ct from t_student group by sex;
+                    // sex  ct    name:sex value ct  HashMap<String,Object> map  map.put(name:sex) map.put(value:ct)
+                    //List<Map<String,Object>> sexvalue  sexvalue.add(map)  ----->(json) {name:sex,value:xxxx}
+                    data: seriesData,
+                    emphasis: {
+                        itemStyle: {
+                            shadowBlur: 10,
+                            shadowOffsetX: 0,
+                            shadowColor: 'rgba(0, 0, 0, 0.5)'
+                        }
+                    }
+                }
+            ]
+        };
+
+        if (option && typeof option === 'object') {
+            myChart.setOption(option);
+        }
+
+        window.addEventListener('resize', myChart.resize);
+    }
+
+</script>
+</html>
