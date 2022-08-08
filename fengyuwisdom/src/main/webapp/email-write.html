@@ -59,7 +59,8 @@
         var tinymce=layui.tinymce,
             form=layui.form,
             $=layui.jquery,
-            table=layui.table;
+            table=layui.table,
+
         //初始化富文本框
         tinymceInit('#content',tinymce,"/email/upload.do","#filepath");
         //选择联系人
@@ -113,7 +114,7 @@
                 if(arr.length>0){
                     $("#emails").val(arr);
                 }else {
-                    layer.alert("请选择联系人！");
+                    layer.msg("请选择联系人");
                 }
                 layer.close(index)
             }
