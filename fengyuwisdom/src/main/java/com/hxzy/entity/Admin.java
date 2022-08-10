@@ -2,6 +2,8 @@ package com.hxzy.entity;
 
 import lombok.Data;
 
+import javax.validation.constraints.Pattern;
+
 @Data
 public class Admin {
     private Integer id;
@@ -21,4 +23,6 @@ public class Admin {
     private String account;
 
     private String email;
+
+    private String phone;
 }

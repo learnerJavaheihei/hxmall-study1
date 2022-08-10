@@ -11,7 +11,7 @@
         body:after {content:'';background-repeat:no-repeat;background-size:cover;-webkit-filter:blur(3px);-moz-filter:blur(3px);-o-filter:blur(3px);-ms-filter:blur(3px);filter:blur(3px);position:absolute;top:0;left:0;right:0;bottom:0;z-index:-1;}
         .layui-container {width: 100%;height: 100%;overflow: hidden}
         .admin-login-background {width:360px;height:300px;position:absolute;left:50%;top:40%;margin-left:-180px;margin-top:-100px;}
-        .logo-title {text-align:center;letter-spacing:2px;padding:14px 0;}
+        .logo-title {text-align:center;letter-spacing:2px;padding:14px 0 0 0;}
         .logo-title h1 {color:#1E9FFF;font-size:25px;font-weight:bold;}
         .login-form {background-color:#fff;border:1px solid #fff;border-radius:3px;padding:14px 20px;box-shadow:0 0 8px #eeeeee;}
         .login-form .layui-form-item {position:relative;}
@@ -20,38 +20,74 @@
         .captcha {width:60%;display:inline-block;}
         .captcha-img {display:inline-block;width:34%;float:right;}
         .captcha-img img {height:34px;border:1px solid #e6e6e6;height:36px;width:100%;}
+        .layui-tab-title li{width: 129px}
+        .layui-tab-title{padding-bottom: 20px}
+        .captcha-img{text-align: center;
+            height: 38px;
+            line-height:38px;
+            cursor:pointer;
+        }
+        #phone_validate{text-align: center;padding-left: 0px;cursor:pointer;}
     </style>
 </head>
 <body>
 <div class="layui-container">
     <div class="admin-login-background">
         <div class="layui-form login-form">
-            <form class="layui-form" action="">
-                <div class="layui-form-item logo-title">
-                    <h1>锋豫智慧平台-登录</h1>
-                </div>
-                <div class="layui-form-item">
-                    <label class="layui-icon layui-icon-username" for="account"></label>
-                    <input type="text" name="account" lay-verify="account" placeholder="用户名或者邮箱" autocomplete="off" class="layui-input" value="admin">
-                </div>
-                <div class="layui-form-item">
-                    <label class="layui-icon layui-icon-password" for="pass"></label>
-                    <input type="password" name="password" lay-verify="password" placeholder="密码" autocomplete="off" class="layui-input"value="123456">
-                </div>
-                <div class="layui-form-item">
-                    <label class="layui-icon layui-icon-vercode" for="captcha"></label>
-                    <input type="text" name="captcha" lay-verify="captcha" placeholder="图形验证码" autocomplete="off" class="layui-input verification captcha" value="">
-                    <div class="captcha-img">
-                        <img id="captchaPic" src="/api/captch/create.do">
+            <div class="layui-form-item logo-title">
+                <h1>锋豫智慧平台-登录</h1>
+            </div>
+            <div class="layui-tab layui-tab-brief" lay-filter="docDemoTabBrief">
+                <ul class="layui-tab-title">
+                    <li class="layui-this" id="account_login">账号登录</li>
+                    <li id="phone_login">手机号登录</li>
+                </ul>
+                <div class="layui-tab-content" style="height: 230px;">
+                    <div class="layui-tab-item layui-show">
+                        <form class="layui-form" action="" id="form_user">
+                            <div class="layui-form-item">
+                                <label class="layui-icon layui-icon-username" for="account"></label>
+                                <input type="text" name="account" lay-verify="account" placeholder="用户名或者邮箱" autocomplete="off" class="layui-input account">
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-icon layui-icon-password" for="pass"></label>
+                                <input type="password" name="password" lay-verify="password" placeholder="密码" autocomplete="off" class="layui-input">
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-icon layui-icon-vercode" for="captcha"></label>
+                                <input type="text" name="captcha" lay-verify="captcha" placeholder="图形验证码" autocomplete="off" class="layui-input verification captcha" value="">
+                                <div class="captcha-img">
+                                    <img id="captchaPic" src="/api/captch/create.do">
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <input type="checkbox" name="rememberMe" value="true" lay-skin="primary" title="记住密码">
+                            </div>
+                            <div class="layui-form-item">
+                                <button class="layui-btn layui-btn layui-btn-normal layui-btn-fluid" lay-submit="" lay-filter="loginByUser">登 入</button>
+                            </div>
+                        </form >
+                    </div>
+                    <div class="layui-tab-item">
+                        <div class="layui-form" id="form_phone">
+                            <div class="layui-form-item">
+                                <label class="layui-icon layui-icon-cellphone-fine"></label>
+                                <input type="text" name="phone" lay-verify="phone" placeholder="手机号码" autocomplete="off" class="layui-input validate" id="phone">
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-icon layui-icon-vercode"></label>
+                                <input type="text" name="phone_validate" lay-verify="phone_validate" placeholder="6位数字验证码" autocomplete="off" class="layui-input verification captcha">
+                                <div class="captcha-img">
+                                    <input type="button" id="phone_validate" value="发送验证码" class="layui-input">
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <button class="layui-btn layui-btn layui-btn-normal layui-btn-fluid" lay-submit="" lay-filter="loginByPhone">登 入</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div class="layui-form-item">
-                    <input type="checkbox" name="rememberMe" value="true" lay-skin="primary" title="记住密码">
-                </div>
-                <div class="layui-form-item">
-                    <button class="layui-btn layui-btn layui-btn-normal layui-btn-fluid" lay-submit="" lay-filter="login">登 入</button>
-                </div>
-            </form>
+            </div>
         </div>
     </div>
 </div>
@@ -60,11 +96,21 @@
 <script src="lib/layui-v2.6.3/layui.js" charset="utf-8"></script>
 <script src="lib/jq-module/jquery.particleground.min.js" charset="utf-8"></script>
 <script>
+    $(function (){
+        //加载使隐藏的选项卡表单验证失效
+        $('#form_phone input:eq(0)').attr("lay-verify","false");
+        $('#form_phone input:eq(1)').attr("lay-verify","false");
+        $('#form_user').find("input").each(function (){
+            var attr = $(this).attr("name");
+            $(this).attr("lay-verify",attr);
+        })
+    })
+
     /*将表单模块导入*/
-    layui.use(['form'],function (){
+    layui.use(['form','jquery'],function (){
         var form =layui.form,
             layer = layui.layer;
-
+        var $ = layui.jquery;
         //登录过期以后，跳出iframe框架
         if (top.location !=self.location) top.location = self.location;
 
@@ -86,23 +132,25 @@
                 if(/^\d+\d+\d$/.test(value)){
                     return '用户名不能全为数字';
                 }
-
             }
-
             //我们既支持上述函数式的方式，也支持下述数组的形式
             //数组的两个值分别代表：[正则匹配、匹配不符时的提示文字]
             ,password: [
                 /^[\S]{6,12}$/
                 ,'密码必须6到12位，且不能出现空格'
             ]
+            ,phone: [
+                /^1[3|4|5|7|8]\d{9}$/
+                ,'请输入正确手机号'
+            ]
+            ,phone_validate:[
+                /^[\S]{6}$/
+                ,'6位数字验证码'
+            ]
         });
         //进行登录操作，前端校验
-        form.on('submit(login)',function (data){
-            console.log(data.field);
+        form.on('submit(loginByUser)',function (data){
             data = data.field;
-            //此处的data其实就是表单的值
-
-
             //发送ajax请求去请求后端接口
             $.post("/api/admin/login.do",data,function (result){
                 if (result.code ==10000){
@@ -116,15 +164,97 @@
                     layer.msg("登录失败，账号密码不正确")
                 }
             });
+            return false;
+        })
+        //验证冲突
+        $("#phone_login").click(function (){
+            $('#form_phone input:eq(0)').attr("lay-verify",$('#form_phone input:eq(0)').attr("name"));
+            $('#form_phone input:eq(1)').attr("lay-verify",$('#form_phone input:eq(1)').attr("name"));
+            $('#form_user').find("input").each(function (){
+                $(this).attr("lay-verify","false");
+            })
+        })
+        $("#account_login").click(function (){
+            $('#form_phone input:eq(0)').attr("lay-verify","false");
+            $('#form_phone input:eq(1)').attr("lay-verify","false");
+            $('#form_user').find("input").each(function (){
+                var attr = $(this).attr("name");
+                $(this).attr("lay-verify",attr);
+            })
+        })
 
-            return  false;
+        //点击发送验证码
+        $(".layui-tab-content").on('click','#phone_validate',function (){
+            var phone = $("#phone").val();
+            if(phone==''){
+                layer.msg("请输入手机号码");
+            }else{
+                $.ajax({
+                    url:"/validatePhone",
+                    type:"POST",
+                    data:"phone="+phone,
+                    success:function (data){
+                        if(data.code!=10000){
+                            layer.msg(data.msg);
+                        }else if(data.code==10000){
+                            waitTime();
+                            //将数据存储到磁盘上
+                            localStorage.setItem("admin",JSON.stringify(data.data));
+                            getValidateCode(phone);
+                        }
+                    }
+                })
+            }
+        })
+        function getValidateCode(phone){
+            $.ajax({
+                url: "/sendSms",
+                type: "POST",
+                data: "phone="+phone,
+                success: function (data) {
+                    var validateCode = data.data;
+                    layer.msg("已发送");
+                    localStorage.setItem("validateCode",validateCode);
+                }
+            })
+        }
+
+        function waitTime(){
+            $("#phone_validate").attr("disabled","true");
+            let maxNum = 45;
+            $("#phone_validate").val(`${maxNum}s重新发送`);
+            //初始显示倒计时
+            let codeCountDown = setInterval(() => {
+                let countDownNum = maxNum--;
+                $("#phone_validate").val(`${countDownNum}s重新发送`);
+                if (countDownNum == 0) {
+                    //倒计时结束
+                    $("#phone_validate").val("发送验证码");
+                    clearInterval(codeCountDown);
+                    $("#phone_validate").attr("disabled","false");
+                }
+            }, 1000);
+        }
+        form.on("submit(loginByPhone)",function (obj){
+            var data = obj.field;
+            var phoneValidate = data.phone_validate;
+            var item = localStorage.getItem("validateCode");
+            if(phoneValidate==item){
+                layer.msg("登录成功",function (){
+                    //登录成功以后跳转到首页
+                    window.location = "/index.html"
+                })
+            }else {
+                layer.msg("登录失败，验证码不正确")
+            }
+            return false;
         })
     })
-
 
     $("#captchaPic").click(function (){
         $("#captchaPic")[0].src="/api/captch/create.do?time="+new Date();
     })
+
 </script>
 </body>
 </html>
