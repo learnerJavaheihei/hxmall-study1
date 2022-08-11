@@ -7,6 +7,7 @@ import com.hxzy.entity.ProjectData;
 import com.hxzy.entity.StudentDDto;
 import com.hxzy.mapper.InfoDtoMapper;
 import com.hxzy.service.GetDatesService;
+import com.hxzy.util.DateSort;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -57,6 +58,6 @@ public class GetDatesServiceImpl implements GetDatesService {
                 }
             }
         }
-        return dates;
+        return DateSort.sort(dates);
     }
 }
